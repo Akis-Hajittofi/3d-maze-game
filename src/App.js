@@ -104,22 +104,14 @@ export function Player() {
       );
     }
     let speed = shift ? 5 : 1;
-    if (right) {
-      ref.current.applyImpulse({ x: speed, y: 0, z: 0 }, true);
-    }
-    if (left) {
-      ref.current.applyImpulse({ x: -speed, y: 0, z: 0 }, true);
-    }
-    if (forward) {
-      ref.current.applyImpulse({ x: 0, y: 0, z: -speed }, true);
-    }
-    if (backward) {
-      ref.current.applyImpulse({ x: 0, y: 0, z: speed }, true);
-    }
-    console.log(jump);
-    if (jump) {
-      ref.current.applyImpulse({ x: 0, y: 1, z: 0 }, true);
-    }
+    ref.current.applyImpulse(
+      {
+        x: (right - left) * speed,
+        y: jump ? 1 : 0,
+        z: (backward - forward) * speed,
+      },
+      true
+    );
   });
   return (
     <>
