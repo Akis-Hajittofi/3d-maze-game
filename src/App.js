@@ -16,12 +16,15 @@ import {
   CapsuleCollider,
   CuboidCollider,
   Physics,
+  RapierRigidBody,
   RigidBody,
+  quat,
   useRapier,
   vec3,
 } from "@react-three/rapier";
 import * as THREE from "three";
 import * as RAPIER from "@dimforge/rapier3d-compat";
+import { radToDeg } from "three/src/math/MathUtils";
 
 function Box(props) {
   // This reference gives us direct access to the THREE.Mesh object
@@ -58,6 +61,60 @@ function Box(props) {
   );
 }
 
+// let offset = new THREE.Vector3(0, 1, 3)
+//   .applyQuaternion(quat(ref.current.rotation()))
+//   .add(vec3(ref.current.translation()));
+
+// let lookAt = new THREE.Vector3(0, 0.5, 1)
+//   .applyQuaternion(quat(ref.current.rotation()))
+//   .add(vec3(ref.current.translation()));
+
+// state.camera.position.copy(offset);
+// boxRef.current.position(offset);
+// refControl.current.onMouseMove((e) => {
+//   console.log("hello");
+// });
+
+// useFrame((state, delta) => {
+//   const { forward, backward, left, right, jump, shift } = get();
+
+//   // if (boxRef.current) {
+//   const cameraDistanceY = window.innerWidth < 1024 ? 16 : 20;
+//   const cameraDistanceZ = window.innerWidth < 1024 ? 12 : 16;
+//   const playersWorldPos = vec3(ref.current.translation());
+
+//   let radius = 3;
+//   x = playersWorldPos.x + radius * Math.sin(state.camera.rotation.y);
+//   z = playersWorldPos.z + radius * Math.cos(state.camera.rotation.y);
+//   ref.current.setRotation(state.camera.quaternion);
+//   // ref.current.setRotation(state.camera.rotation.y);
+//   // boxRef.current.setLookAt(
+//   //   x,
+//   //   1.5,
+//   //   z,
+
+//   //   playersWorldPos.x,
+//   //   playersWorldPos.y,
+//   //   playersWorldPos.z
+//   //   // true
+//   // );
+
+//   state.camera.position.copy({ x, y: 0, z }).add({ x: 0, y: 3, z: 0 });
+//   // state.camera.lookAt(playersWorldPos);
+//   // }
+//   // movement
+
+// let speed = shift ? 5 : 1;
+//   ref.current.applyImpulse(
+//     {
+//       x: (right - left) * speed,
+//       y: jump ? 1 : 0,
+//       z: (backward - forward) * speed,
+//     },
+//     true
+//   );
+// });
+
 function Ground(props) {
   return (
     <RigidBody {...props} type="fixed" colliders={false}>
@@ -81,78 +138,74 @@ const sideVector = new THREE.Vector3();
 const rotation = new THREE.Vector3();
 
 export function Player() {
-  const ref = useRef();
-  const camRef = useRef();
-  const rapier = useRapier();
+  const player = useRef();
   const [, get] = useKeyboardControls();
 
-  useFrame((state) => {
-    const { forward, backward, left, right, jump, shift } = get();
-    if (camRef.current) {
-      const cameraDistanceY = window.innerWidth < 1024 ? 16 : 20;
-      const cameraDistanceZ = window.innerWidth < 1024 ? 12 : 16;
-      const playersWorldPos = vec3(ref.current.translation());
+  let moveCamera = (q, state) => {};
 
-      camRef.current.setLookAt(
-        playersWorldPos.x,
-        playersWorldPos.y + cameraDistanceY,
-        playersWorldPos.z + cameraDistanceZ + 15,
-        playersWorldPos.x,
-        playersWorldPos.y + 1.5,
-        playersWorldPos.z - 2,
-        true
-      );
-    }
-    let speed = shift ? 5 : 1;
-    ref.current.applyImpulse(
+  useFrame((state, delta) => {
+    const { forward, backward, left, right, jump, shift, q } = get();
+    let playerPos = vec3(player.current.translation());
+    let playerQuat = quat(player.current.rotation());
+
+    let playerOffset = q
+      ? new THREE.Vector3(0, 1, 5)
+      : new THREE.Vector3(0, 0, 0);
+    let alpha = q ? 0.05 : 0.27;
+
+    // state.camera.position.lerp(
+    //   playerOffset.applyQuaternion(playerQuat).add(playerPos),
+    //   alpha
+    // );
+
+    let followVector = playerOffset.applyQuaternion(playerQuat).add(playerPos);
+    state.camera.position.copy(followVector);
+
+    // rotation need to be set before movement
+    player.current.setRotation(state.camera.quaternion);
+
+    const forwardVector = state.camera.getWorldDirection(new THREE.Vector3());
+    const vectorUp = new THREE.Vector3(0, 1, 0);
+    const sideVector = vectorUp.cross(forwardVector);
+
+    let speed = shift ? 5 : 1; // based on camera direction
+    const directionalVector = forwardVector
+      .multiplyScalar(-(backward - forward) * speed)
+      .add(sideVector.multiplyScalar(-(right - left) * speed));
+
+    player.current.applyImpulse(
       {
-        x: (right - left) * speed,
+        x: directionalVector.x,
         y: jump ? 1 : 0,
-        z: (backward - forward) * speed,
+        z: directionalVector.z,
       },
       true
     );
   });
+
   return (
     <>
-      {" "}
-      <CameraControls ref={camRef} />
       <RigidBody
-        ref={ref}
-        colliders={"cuboid"}
+        ref={player}
+        colliders={false}
         mass={1}
         type="dynamic"
-        position={[0, 0, 0]}
         lockRotations
+        position={[0, 0, 0]}
         linearDamping={14}
       >
         <mesh>
-          <boxGeometry args={[1, 1, 1]} />
-          <meshStandardMaterial color={"hotpink"} />
+          <capsuleGeometry args={[0.5, 1.5]} />
+          <meshStandardMaterial color={"lime"} />
         </mesh>
+        <CapsuleCollider args={[0.75, 0.5]} />
       </RigidBody>
     </>
   );
 }
 
 function App() {
-  // let Controls = {
-  //   forward: "forward",
-  //   back: "back",
-  //   left: "left",
-  //   right: "right",
-  //   jump: "jump",
-  // };
-  // const map = useMemo(
-  //   () => [
-  //     { name: Controls.forward, keys: ["ArrowUp", "KeyW"] },
-  //     { name: Controls.back, keys: ["ArrowDown", "KeyS"] },
-  //     { name: Controls.left, keys: ["ArrowLeft", "KeyA"] },
-  //     { name: Controls.right, keys: ["ArrowRight", "KeyD"] },
-  //
-  //   ],
-  //   []
-  // );
+  let pc = useRef();
   return (
     <KeyboardControls
       map={[
@@ -162,26 +215,26 @@ function App() {
         { name: "right", keys: ["ArrowRight", "d", "D"] },
         { name: "jump", keys: ["Space"] },
         { name: "shift", keys: ["Shift"] },
+        { name: "q", keys: ["q", "Q"] },
       ]}
     >
-      <Canvas shadows camera={{ fov: 20 }}>
+      <Canvas shadows camera={{ position: [0, 4, 4] }}>
         <ambientLight intensity={Math.PI / 2} />
-        {/* <spotLight
+        <spotLight
           position={[10, 10, 10]}
           angle={0.15}
           penumbra={1}
           decay={0}
           intensity={Math.PI}
-        /> */}
+        />
         <pointLight position={[-10, -10, -10]} decay={0} intensity={Math.PI} />
-        <Physics gravity={[0, -30, 0]} debug>
+        <Physics gravity={[0, -30, 0]}>
           <Sky sunPosition={[100, 20, 100]} />
           <Ground />
-          <Box position={[-2, 5, 0]} />
-          <Box position={[1, 1, 0]} />
-          <Player />
+          <Player pc={pc} />
+          <Box position={[1, 3, 1]} />
         </Physics>
-        <PointerLockControls />
+        <PointerLockControls ref={pc} />
       </Canvas>
     </KeyboardControls>
   );
