@@ -153,13 +153,10 @@ export function Player() {
       : new THREE.Vector3(0, 0, 0);
     let alpha = q ? 0.05 : 0.27;
 
-    // state.camera.position.lerp(
-    //   playerOffset.applyQuaternion(playerQuat).add(playerPos),
-    //   alpha
-    // );
-
-    let followVector = playerOffset.applyQuaternion(playerQuat).add(playerPos);
-    state.camera.position.copy(followVector);
+    state.camera.position.lerp(
+      playerOffset.applyQuaternion(playerQuat).add(playerPos),
+      alpha
+    );
 
     // rotation need to be set before movement
     player.current.setRotation(state.camera.quaternion);
