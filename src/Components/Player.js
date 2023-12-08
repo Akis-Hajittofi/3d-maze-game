@@ -9,7 +9,7 @@ const moveCamera = (player, camera, changeView) => {
   let playerQuat = quat(player.rotation());
 
   let playerOffset = !changeView ? new Vector3(0, 1, 5) : new Vector3(0, 0, 0);
-  let alpha = changeView ? 0.05 : 0.27;
+  let alpha = !changeView ? 0.05 : 0.27;
 
   camera.position.lerp(
     playerOffset.applyQuaternion(playerQuat).add(playerPos),
@@ -25,7 +25,7 @@ const movePlayer = (player, camera, controls) => {
   const vectorUp = new Vector3(0, 1, 0);
   const sideVector = vectorUp.cross(forwardVector);
 
-  let speed = shift ? 5 : 1;
+  let speed = shift ? 2.5 : 1;
   // based on camera world direction
   const directionalVector = forwardVector
     .multiplyScalar(-(backward - forward) * speed)
