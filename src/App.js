@@ -5,24 +5,26 @@ import { useMemo, useRef, useState } from "react";
 import { CuboidCollider, Physics, RigidBody } from "@react-three/rapier";
 import Player from "./Components/Player";
 
-function Room(props) {
+function Wall({ props, position, rotation }) {
   const ref = useRef();
 
   return (
-    <>
-      <RigidBody type="fixed" colliders={"cuboid"}>
-        <mesh {...props} ref={ref} position={[-30, 1.5, 0]}>
-          <boxGeometry args={[30, 3, 1]} />
-          <meshStandardMaterial color={"black"} />
-        </mesh>
-      </RigidBody>
+    <RigidBody type="fixed" colliders={"cuboid"}>
+      <mesh {...props} ref={ref} position={position} rotation={rotation}>
+        <boxGeometry args={[31, 15, 1]} />
+        <meshStandardMaterial color={"gray"} />
+      </mesh>
+    </RigidBody>
+  );
+}
 
-      <RigidBody type="fixed" colliders={"cuboid"}>
-        <mesh {...props} ref={ref} position={[0, 1.5, -30]}>
-          <boxGeometry args={[30, 3, 1]} />
-          <meshStandardMaterial color={"black"} />
-        </mesh>
-      </RigidBody>
+function Room({ x, z }) {
+  return (
+    <>
+      <Wall position={[15 + x, 3, 15 + z]} rotation={undefined} />
+      <Wall position={[30 + x, 3, 30 + z]} rotation={[0, Math.PI / 2, 0]} />
+      <Wall position={[0 + x, 3, 30 + z]} rotation={[0, Math.PI / 2, 0]} />
+      <Wall position={[15 + x, 3, 45 + z]} rotation={undefined} />
     </>
   );
 }
@@ -39,21 +41,7 @@ function Box(props) {
   // Return the view, these are regular Threejs elements expressed in JSX
   return (
     <RigidBody type="dynamic">
-      <mesh
-        {...props}
-        ref={ref}
-        scale={clicked ? 1.5 : 1}
-        // onClick={(event) => {
-        //   console.log(count);
-        //   count.current += 1;
-        //   if (count.current == 10) {
-        //     count.current = 1;
-        //   }
-        //   click(!clicked);
-        // }}
-        // onPointerOver={(event) => (event.stopPropagation(), hover(true))}
-        // onPointerOut={(event) => hover(false)}
-      >
+      <mesh {...props} ref={ref} scale={clicked ? 1.5 : 1}>
         <boxGeometry args={[1, 1, 1]} />
         <meshStandardMaterial color={hovered ? "hotpink" : "orange"} />
       </mesh>
@@ -65,17 +53,30 @@ function Ground(props) {
   return (
     <RigidBody {...props} type="fixed" colliders={false}>
       <mesh receiveShadow position={[0, 0, 0]} rotation-x={-Math.PI / 2}>
-        <planeGeometry args={[1000, 1000]} />
-        <meshStandardMaterial
-          // map={texture}
-          // map-repeat={[240, 240]}
-          color="green"
-        />
+        <planeGeometry args={[500, 1000]} />
+        <meshStandardMaterial color="green" />
       </mesh>
       <CuboidCollider args={[1000, 2, 1000]} position={[0, -2, 0]} />
     </RigidBody>
   );
 }
+
+// function Roof(props) {
+//   return (
+//     <RigidBody
+//       {...props}
+//       type="fixed"
+//       colliders={"cuboid"}
+//       position={[0, 15, 0]}
+//     >
+//       <mesh receiveShadow position={[0, 10, 0]} rotation-x={Math.PI / 2}>
+//         <boxGeometry args={[1000, 1000, 0.1]} />
+//         <meshStandardMaterial color="hotpink" />
+//       </mesh>
+//     </RigidBody>
+//   );
+// }
+
 function App() {
   let pc = useRef();
   return (
@@ -102,9 +103,12 @@ function App() {
         <pointLight position={[-10, -10, -10]} decay={0} intensity={Math.PI} />
         <Physics gravity={[0, -30, 0]} debug>
           <Sky sunPosition={[100, 20, 100]} />
+          {/* <Roof /> */}
           <Ground />
           <Player pc={pc} />
-          <Room />
+          <Room x={1} z={1} />
+          <Room x={50} z={50} />
+
           <Box position={[1, 3, 1]} />
         </Physics>
         <PointerLockControls ref={pc} />
