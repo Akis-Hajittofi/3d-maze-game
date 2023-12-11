@@ -5,26 +5,24 @@ import { useMemo, useRef, useState } from "react";
 import { CuboidCollider, Physics, RigidBody } from "@react-three/rapier";
 import Player from "./Components/Player";
 
-function Wall({ props, position, rotation }) {
-  const ref = useRef();
-
+function Wall({ position, rotation, color = "gray" }) {
   return (
     <RigidBody type="fixed" colliders={"cuboid"}>
-      <mesh {...props} ref={ref} position={position} rotation={rotation}>
+      <mesh rotation={rotation} position={position}>
         <boxGeometry args={[31, 15, 1]} />
-        <meshStandardMaterial color={"gray"} />
+        <meshStandardMaterial color={color} />
       </mesh>
     </RigidBody>
   );
 }
 
-function Room({ x, z }) {
+function Room({ x, z, doors = [0, 0, 0, 0] }) {
   return (
     <>
-      <Wall position={[15 + x, 3, 15 + z]} rotation={undefined} />
-      <Wall position={[30 + x, 3, 30 + z]} rotation={[0, Math.PI / 2, 0]} />
-      <Wall position={[0 + x, 3, 30 + z]} rotation={[0, Math.PI / 2, 0]} />
-      <Wall position={[15 + x, 3, 45 + z]} rotation={undefined} />
+      <Wall position={[15 + x, 3, 0 + z]} />
+      <Wall position={[0 + x, 3, 15 + z]} rotation={[0, Math.PI / 2, 0]} />
+      <Wall position={[15 + x, 3, 30 + z]} />
+      <Wall position={[30 + x, 3, 15 + z]} rotation={[0, Math.PI / 2, 0]} />
     </>
   );
 }
