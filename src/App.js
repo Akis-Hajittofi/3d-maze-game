@@ -5,6 +5,7 @@ import { Suspense, useEffect, useState, useRef } from "react";
 import { CuboidCollider, Physics, RigidBody } from "@react-three/rapier";
 import Player from "./Components/Player";
 import Coin from "./Components/Coin";
+
 function Wall({ position, rotation, color = "gray" }) {
   return (
     <RigidBody type="fixed" colliders={"cuboid"}>
@@ -15,10 +16,44 @@ function Wall({ position, rotation, color = "gray" }) {
     </RigidBody>
   );
 }
+
+function WallWithDoor({ position, rotation, color = "gray" }) {
+  const offset = 8.5;
+  const width = 12;
+  let leftWall = [position[0] - offset, position[1], position[2]];
+  let topWall = [position[0], position[1] + 5, position[2]];
+  let rightWall = [position[0] + offset, position[1], position[2]];
+  return (
+    <mesh>
+      <RigidBody type="fixed" colliders={"cuboid"}>
+        <mesh position={leftWall}>
+          <boxGeometry args={[width, 15, 1]} />
+          <meshStandardMaterial color={"red"} />
+        </mesh>
+      </RigidBody>
+
+      <RigidBody type="fixed" colliders={"cuboid"}>
+        <mesh position={topWall}>
+          <boxGeometry args={[5, 5, 1]} />
+          <meshStandardMaterial color={"yellow"} />
+        </mesh>
+      </RigidBody>
+
+      <RigidBody type="fixed" colliders={"cuboid"}>
+        <mesh position={rightWall}>
+          <boxGeometry args={[width, 15, 1]} />
+          <meshStandardMaterial color={"green"} />
+        </mesh>
+      </RigidBody>
+    </mesh>
+  );
+}
 function Room({ x, z, doors = [0, 0, 0, 0] }) {
+  x += -15;
+  z += -15;
   return (
     <>
-      <Wall position={[15 + x, 3, 0 + z]} />
+      <WallWithDoor position={[15 + x, 3, 0 + z]} />
       <Wall position={[0 + x, 3, 15 + z]} rotation={[0, Math.PI / 2, 0]} />
       <Wall position={[15 + x, 3, 30 + z]} />
       <Wall position={[30 + x, 3, 15 + z]} rotation={[0, Math.PI / 2, 0]} />
