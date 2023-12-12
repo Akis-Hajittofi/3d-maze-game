@@ -8,7 +8,9 @@ const moveCamera = (player, camera, changeView) => {
   let playerPos = vec3(player.translation());
   let playerQuat = quat(player.rotation());
 
-  let playerOffset = !changeView ? new Vector3(0, 1, 5) : new Vector3(0, 0, 0);
+  let playerOffset = !changeView
+    ? new Vector3(0, 1, 5)
+    : new Vector3(0, 0.7, 0);
   let alpha = !changeView ? 0.05 : 0.27;
 
   camera.position.lerp(

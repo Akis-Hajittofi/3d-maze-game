@@ -1,20 +1,29 @@
 import { KeyboardControls, PointerLockControls, Sky } from "@react-three/drei";
 import "./App.css";
-import { Canvas } from "@react-three/fiber";
-import { Suspense, useEffect, useState } from "react";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { Suspense, useEffect, useState, useRef } from "react";
 import { CuboidCollider, Physics, RigidBody } from "@react-three/rapier";
 import Player from "./Components/Player";
 import Coin from "./Components/Coin";
-
-function Box() {
+function Wall({ position, rotation, color = "gray" }) {
   return (
-    <RigidBody type="dynamic" position={[5, 2, 10]}>
-      <mesh>
-        <boxGeometry args={[1, 1, 1]} />
-        <meshStandardMaterial color={"orange"} />
+    <RigidBody type="fixed" colliders={"cuboid"}>
+      <mesh rotation={rotation} position={position}>
+        <boxGeometry args={[31, 15, 1]} />
+        <meshStandardMaterial color={color} />
       </mesh>
-      <CuboidCollider args={[0.5, 0.5, 0.5]} />
     </RigidBody>
+  );
+}
+
+function Room({ x, z, doors = [0, 0, 0, 0] }) {
+  return (
+    <>
+      <Wall position={[15 + x, 3, 0 + z]} />
+      <Wall position={[0 + x, 3, 15 + z]} rotation={[0, Math.PI / 2, 0]} />
+      <Wall position={[15 + x, 3, 30 + z]} />
+      <Wall position={[30 + x, 3, 15 + z]} rotation={[0, Math.PI / 2, 0]} />
+    </>
   );
 }
 
@@ -70,6 +79,8 @@ function App() {
             <Sky sunPosition={[100, 20, 100]} />
             <Ground />
             <Coins />
+            <Room x={50} z={50} />
+            <Room z={-50} x={-50} />
             <RigidBody type="fixed" colliders={"cuboid"}>
               <mesh
                 receiveShadow
@@ -83,15 +94,10 @@ function App() {
                   decay={1}
                 />
                 <boxGeometry args={[5, 5, 0.1]} />
-                <meshStandardMaterial
-                  // map={texture}
-                  // map-repeat={[240, 240]}
-                  color="hotpink"
-                />
+                <meshStandardMaterial color="hotpink" />
               </mesh>
             </RigidBody>
             <Player />
-            <Box position={[1, 3, 1]} />
           </Physics>
           <PointerLockControls />
         </Canvas>
