@@ -6,11 +6,12 @@ import { CuboidCollider, Physics, RigidBody } from "@react-three/rapier";
 import Player from "./Components/Player";
 import Coin from "./Components/Coin";
 
-function Wall({ position, rotation, color = "gray" }) {
+function Wall({ position, rotation, color = "gray", l = 30 }) {
+  let wallDepth = 0.5;
   return (
     <RigidBody type="fixed" colliders={"cuboid"}>
       <mesh rotation={rotation} position={position}>
-        <boxGeometry args={[31, 15, 1]} />
+        <boxGeometry args={[l + wallDepth, 15, wallDepth]} />
         <meshStandardMaterial color={color} />
       </mesh>
     </RigidBody>
@@ -48,15 +49,25 @@ function WallWithDoor({ position, rotation, color = "gray" }) {
     </mesh>
   );
 }
-function Room({ x, z, doors = [0, 0, 0, 0] }) {
+function Room({ x, z, size, doors = [0, 0, 0, 0] }) {
+  let [xLength, zLength] = size;
+  // change the length of the wall based on the size
   x += -15;
   z += -15;
   return (
     <>
-      <WallWithDoor position={[15 + x, 3, 0 + z]} />
+      <Wall position={[15 + x, 3, 0 + z]} />
       <Wall position={[0 + x, 3, 15 + z]} rotation={[0, Math.PI / 2, 0]} />
       <Wall position={[15 + x, 3, 30 + z]} />
       <Wall position={[30 + x, 3, 15 + z]} rotation={[0, Math.PI / 2, 0]} />
+      <mesh
+        receiveShadow
+        position={[x + 15, 0, z + 15]}
+        rotation-x={Math.PI / 2}
+      >
+        <boxGeometry args={[1, 1, 1]} />
+        <meshStandardMaterial color="green" />
+      </mesh>
     </>
   );
 }
@@ -113,7 +124,8 @@ function App() {
             <Sky sunPosition={[100, 20, 100]} />
             <Ground />
             <Coins />
-            <Room x={50} z={50} />
+            <Room x={50} z={50} size={[10, 20]} />
+
             <RigidBody type="fixed" colliders={"cuboid"}>
               <mesh
                 receiveShadow
@@ -131,11 +143,8 @@ function App() {
               </mesh>
             </RigidBody>
 
-            <Room z={0} x={0} />
-            <mesh receiveShadow position={[0, 0, 0]} rotation-x={Math.PI / 2}>
-              <boxGeometry args={[1, 1, 1]} />
-              <meshStandardMaterial color="green" />
-            </mesh>
+            <Room z={0} x={0} size={[30, 30]} />
+
             <Player />
           </Physics>
           <PointerLockControls />
