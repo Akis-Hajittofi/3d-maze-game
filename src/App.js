@@ -15,7 +15,6 @@ function Wall({ position, rotation, color = "gray" }) {
     </RigidBody>
   );
 }
-
 function Room({ x, z, doors = [0, 0, 0, 0] }) {
   return (
     <>
@@ -80,7 +79,6 @@ function App() {
             <Ground />
             <Coins />
             <Room x={50} z={50} />
-            <Room z={-50} x={-50} />
             <RigidBody type="fixed" colliders={"cuboid"}>
               <mesh
                 receiveShadow
@@ -97,6 +95,12 @@ function App() {
                 <meshStandardMaterial color="hotpink" />
               </mesh>
             </RigidBody>
+
+            <Room z={0} x={0} />
+            <mesh receiveShadow position={[0, 0, 0]} rotation-x={Math.PI / 2}>
+              <boxGeometry args={[1, 1, 1]} />
+              <meshStandardMaterial color="green" />
+            </mesh>
             <Player />
           </Physics>
           <PointerLockControls />
