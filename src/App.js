@@ -7,7 +7,7 @@ import Player from "./Components/Player";
 import Coin from "./Components/Coin";
 
 function Wall({ position, rotation, color = "gray", l = 30 }) {
-  let wallDepth = 0.5;
+  let wallDepth = 1;
   return (
     <RigidBody type="fixed" colliders={"cuboid"}>
       <mesh rotation={rotation} position={position}>
@@ -51,18 +51,26 @@ function WallWithDoor({ position, rotation, color = "gray" }) {
 }
 function Room({ x, z, size, doors = [0, 0, 0, 0] }) {
   let [xLength, zLength] = size;
-  // change the length of the wall based on the size
-  x += -15;
-  z += -15;
+
   return (
     <>
-      <Wall position={[15 + x, 3, 0 + z]} />
-      <Wall position={[0 + x, 3, 15 + z]} rotation={[0, Math.PI / 2, 0]} />
-      <Wall position={[15 + x, 3, 30 + z]} />
-      <Wall position={[30 + x, 3, 15 + z]} rotation={[0, Math.PI / 2, 0]} />
+      <Wall position={[xLength / 2 + x, 3, 0 + z]} l={xLength} color={"red"} />
+      <Wall
+        position={[0 + x, 3, zLength / 2 + z]}
+        rotation={[0, Math.PI / 2, 0]}
+        l={zLength}
+        color={"lime"}
+      />
+      <Wall position={[xLength / 2 + x, 3, zLength + z]} l={xLength} />
+      <Wall
+        position={[xLength + x, 3, zLength / 2 + z]}
+        rotation={[0, Math.PI / 2, 0]}
+        l={zLength}
+        color={"purple"}
+      />
       <mesh
         receiveShadow
-        position={[x + 15, 0, z + 15]}
+        position={[xLength / 2 + x, 0, xLength / 2 + z]}
         rotation-x={Math.PI / 2}
       >
         <boxGeometry args={[1, 1, 1]} />
@@ -124,7 +132,7 @@ function App() {
             <Sky sunPosition={[100, 20, 100]} />
             <Ground />
             <Coins />
-            <Room x={50} z={50} size={[10, 20]} />
+            <Room x={50} z={50} size={[20, 20]} />
 
             <RigidBody type="fixed" colliders={"cuboid"}>
               <mesh
@@ -143,7 +151,7 @@ function App() {
               </mesh>
             </RigidBody>
 
-            <Room z={0} x={0} size={[30, 30]} />
+            <Room z={0} x={0} size={[40, 30]} />
 
             <Player />
           </Physics>
