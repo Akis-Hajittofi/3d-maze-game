@@ -27,7 +27,7 @@ const movePlayer = (player, camera, controls) => {
   const vectorUp = new Vector3(0, 1, 0);
   const sideVector = vectorUp.cross(forwardVector);
 
-  let speed = shift ? 2.5 : 1;
+  let speed = shift ? 6 : 2;
   // based on camera world direction
   const directionalVector = forwardVector
     .multiplyScalar(-(backward - forward) * speed)
@@ -36,14 +36,14 @@ const movePlayer = (player, camera, controls) => {
   player.applyImpulse(
     {
       x: directionalVector.x,
-      y: jump ? 1 : 0,
+      y: jump ? 3 : 0,
       z: directionalVector.z,
     },
     true
   );
 };
 
-const Player = () => {
+const Player = ({ coin }) => {
   const player = useRef();
   const [, get] = useKeyboardControls();
 
@@ -58,17 +58,19 @@ const Player = () => {
   return (
     <>
       <RigidBody
+        name="player"
         ref={player}
         colliders={false}
-        mass={1}
+        mass={70}
         type="dynamic"
         lockRotations
-        position={[0, 0, 0]}
+        gravityScale={8}
         linearDamping={14}
+        userData={"player"}
       >
-        <mesh>
+        <mesh rotation={[0, 0, 0]} position={[0, 0, 0]}>
           <capsuleGeometry args={[0.5, 1.5]} />
-          <meshStandardMaterial color={"lime"} />
+          <meshStandardMaterial color={"royalblue"} />
         </mesh>
         <CapsuleCollider args={[0.75, 0.5]} />
       </RigidBody>

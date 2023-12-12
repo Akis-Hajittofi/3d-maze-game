@@ -1,10 +1,10 @@
 import { KeyboardControls, PointerLockControls, Sky } from "@react-three/drei";
 import "./App.css";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useState, useRef } from "react";
 import { CuboidCollider, Physics, RigidBody } from "@react-three/rapier";
 import Player from "./Components/Player";
-
+import Coin from "./Components/Coin";
 function Wall({ position, rotation, color = "gray" }) {
   return (
     <RigidBody type="fixed" colliders={"cuboid"}>
@@ -26,57 +26,35 @@ function Room({ x, z, doors = [0, 0, 0, 0] }) {
     </>
   );
 }
-function Box(props) {
-  // This reference gives us direct access to the THREE.Mesh object
-  const ref = useRef();
-  const count = useRef(0);
-  // Hold state for hovered and clicked events
-  const [hovered, hover] = useState(false);
-  const [clicked, click] = useState(false);
-  // Subscribe this component to the render-loop, rotate the mesh every frame
-
-  useFrame((state, delta) => (ref.current.rotation.x += delta * count.current));
-  // Return the view, these are regular Threejs elements expressed in JSX
-  return (
-    <RigidBody type="dynamic">
-      <mesh {...props} ref={ref} scale={clicked ? 1.5 : 1}>
-        <boxGeometry args={[1, 1, 1]} />
-        <meshStandardMaterial color={hovered ? "hotpink" : "orange"} />
-      </mesh>
-    </RigidBody>
-  );
-}
 
 function Ground(props) {
   return (
-    <RigidBody {...props} type="fixed" colliders={false}>
+    <RigidBody {...props} type="fixed" colliders={false} friction={2}>
       <mesh receiveShadow position={[0, 0, 0]} rotation-x={-Math.PI / 2}>
-        <planeGeometry args={[500, 1000]} />
-        <meshStandardMaterial color="green" />
+        <planeGeometry args={[1000, 1000]} />
+        <meshStandardMaterial color="springgreen" />
       </mesh>
       <CuboidCollider args={[1000, 2, 1000]} position={[0, -2, 0]} />
     </RigidBody>
   );
 }
 
-// function Roof(props) {
-//   return (
-//     <RigidBody
-//       {...props}
-//       type="fixed"
-//       colliders={"cuboid"}
-//       position={[0, 15, 0]}
-//     >
-//       <mesh receiveShadow position={[0, 10, 0]} rotation-x={Math.PI / 2}>
-//         <boxGeometry args={[1000, 1000, 0.1]} />
-//         <meshStandardMaterial color="hotpink" />
-//       </mesh>
-//     </RigidBody>
-//   );
-// }
+function Coins() {
+  const [coins, setCoins] = useState([]);
+  useEffect(() => {
+    setCoins([
+      <Coin setCoins={setCoins} x={1} z={1} key={0} id={0} />,
+      <Coin setCoins={setCoins} x={1} z={2} key={1} id={1} />,
+      <Coin setCoins={setCoins} x={1} z={3} key={2} id={2} />,
+      <Coin setCoins={setCoins} x={1} z={-1} key={3} id={3} />,
+      <Coin setCoins={setCoins} x={1} z={-2} key={4} id={4} />,
+      <Coin setCoins={setCoins} x={1} z={-3} key={5} id={5} />,
+    ]);
+  }, []);
+  return coins.map((coin) => coin);
+}
 
 function App() {
-  let pc = useRef();
   return (
     <KeyboardControls
       map={[
@@ -89,28 +67,41 @@ function App() {
         { name: "q", keys: ["q", "Q"] },
       ]}
     >
-      <Canvas shadows camera={{ position: [0, 4, 4] }}>
-        <ambientLight intensity={Math.PI / 2} />
-        <spotLight
-          position={[10, 10, 10]}
-          angle={0.15}
-          penumbra={1}
-          decay={0}
-          intensity={Math.PI}
-        />
-        <pointLight position={[-10, -10, -10]} decay={0} intensity={Math.PI} />
-        <Physics gravity={[0, -30, 0]} debug>
-          <Sky sunPosition={[100, 20, 100]} />
-          {/* <Roof /> */}
-          <Ground />
-          <Player pc={pc} />
-          <Room x={1} z={1} />
-          <Room x={50} z={50} />
-
-          <Box position={[1, 3, 1]} />
-        </Physics>
-        <PointerLockControls ref={pc} />
-      </Canvas>
+      <Suspense>
+        <Canvas shadows camera={{ position: [0, -0.5, 4] }}>
+          <ambientLight intensity={Math.PI / 2} />
+          <pointLight
+            position={[-10, -10, -10]}
+            decay={0}
+            intensity={Math.PI}
+          />
+          <Physics gravity={[0, -9.81, 0]} debug>
+            <Sky sunPosition={[100, 20, 100]} />
+            <Ground />
+            <Coins />
+            <Room x={50} z={50} />
+            <Room z={-50} x={-50} />
+            <RigidBody type="fixed" colliders={"cuboid"}>
+              <mesh
+                receiveShadow
+                position={[10, 5, 10]}
+                rotation-x={Math.PI / 2}
+              >
+                <pointLight
+                  color={"white"}
+                  intensity={10}
+                  distance={8}
+                  decay={1}
+                />
+                <boxGeometry args={[5, 5, 0.1]} />
+                <meshStandardMaterial color="hotpink" />
+              </mesh>
+            </RigidBody>
+            <Player />
+          </Physics>
+          <PointerLockControls />
+        </Canvas>
+      </Suspense>
     </KeyboardControls>
   );
 }
