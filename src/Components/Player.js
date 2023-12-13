@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { useKeyboardControls } from "@react-three/drei";
+import { PointerLockControls, useKeyboardControls } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { CapsuleCollider, RigidBody, quat, vec3 } from "@react-three/rapier";
 import { Vector3 } from "three";
@@ -8,9 +8,7 @@ const moveCamera = (player, camera, changeView) => {
   let playerPos = vec3(player.translation());
   let playerQuat = quat(player.rotation());
 
-  let playerOffset = !changeView
-    ? new Vector3(0, 1, 5)
-    : new Vector3(0, 0.7, 0);
+  let playerOffset = !changeView ? new Vector3(0, 2, 5) : new Vector3(0, 1, 0);
   let alpha = !changeView ? 0.05 : 0.27;
 
   camera.position.lerp(
@@ -43,10 +41,11 @@ const movePlayer = (player, camera, controls) => {
   );
 };
 
-const Player = ({ coin }) => {
+const Player = ({ shoot }) => {
   const player = useRef();
   const [, get] = useKeyboardControls();
-
+  const lastShoot = useRef(0);
+  lastShoot.current = Date.now();
   useFrame((state) => {
     const controls = get();
     if (player?.current) {
@@ -57,6 +56,21 @@ const Player = ({ coin }) => {
 
   return (
     <>
+      <PointerLockControls
+        onLock={(e) => {
+          let playerPos = vec3(player.current.translation());
+          let playerQuat = quat(player.current.rotation());
+          if (Date.now() - lastShoot.current > 75) {
+            lastShoot.current = Date.now();
+            let bullet = {
+              id: Date.now(),
+              playerPos,
+              playerQuat,
+            };
+            shoot(bullet);
+          }
+        }}
+      />
       <RigidBody
         name="player"
         ref={player}
@@ -70,7 +84,7 @@ const Player = ({ coin }) => {
       >
         <mesh rotation={[0, 0, 0]} position={[0, 0, 0]}>
           <capsuleGeometry args={[0.5, 1.5]} />
-          <meshStandardMaterial color={"royalblue"} />
+          <meshStandardMaterial color={"#F471B5"} />
         </mesh>
         <CapsuleCollider args={[0.75, 0.5]} />
       </RigidBody>

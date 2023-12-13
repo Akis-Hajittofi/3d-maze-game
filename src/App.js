@@ -6,7 +6,9 @@ import { CuboidCollider, Physics, RigidBody } from "@react-three/rapier";
 import Player from "./Components/Player";
 import Coin from "./Components/Coin";
 
-function Wall({ position, rotation, color = "gray", l = 30 }) {
+import { Euler, MeshBasicMaterial, Vector3 } from "three";
+
+function Wall({ position, rotation, color = "#0F172A", l = 30 }) {
   let wallDepth = 0.5;
   return (
     <RigidBody type="fixed" colliders={"cuboid"}>
@@ -74,10 +76,16 @@ function Room({ x, z, size, doors = [0, 0, 0, 0] }) {
 
 function Ground(props) {
   return (
-    <RigidBody {...props} type="fixed" colliders={false} friction={2}>
+    <RigidBody
+      {...props}
+      type="fixed"
+      colliders={false}
+      friction={2}
+      name="ground"
+    >
       <mesh receiveShadow position={[0, 0, 0]} rotation-x={-Math.PI / 2}>
         <planeGeometry args={[1000, 1000]} />
-        <meshStandardMaterial color="springgreen" />
+        <meshStandardMaterial color="#38BDF8" />
       </mesh>
       <CuboidCollider args={[1000, 2, 1000]} position={[0, -2, 0]} />
     </RigidBody>
@@ -98,8 +106,77 @@ function Coins() {
   }, []);
   return coins.map((coin) => coin);
 }
+const bulletMaterial = new MeshBasicMaterial({
+  color: "hotpink",
+  toneMapped: false,
+});
+
+bulletMaterial.color.multiplyScalar(42);
+
+function Bullet({ bulletInfo, onHit }) {
+  // console.log(bulletInfo);
+  let p = new Vector3(0.5, 1, -1)
+    .applyQuaternion(bulletInfo.playerQuat)
+    .add(bulletInfo.playerPos);
+  let r = new Euler().setFromQuaternion(bulletInfo.playerQuat);
+  const ref = useRef();
+
+  useFrame(() => {
+    if (ref?.current) {
+      let forward = new Vector3(0, 0, -1).applyQuaternion(
+        bulletInfo.playerQuat
+      );
+      forward.multiplyScalar(0.1); //speed
+      ref.current.applyImpulse(forward);
+    }
+  });
+
+  return (
+    <RigidBody
+      ref={ref}
+      type="dynamic"
+      name="bullet"
+      colliders={"cuboid"}
+      gravityScale={0}
+      // sensor
+      onCollisionEnter={({ other }) => {
+        if (other.rigidBodyObject.name !== "player") {
+          console.log(other.rigidBodyObject);
+          onHit(bulletInfo.id);
+        }
+      }}
+    >
+      <mesh
+        position={[p.x, p.y, p.z]}
+        rotation={[r.x, r.y, r.z]}
+        material={bulletMaterial}
+        castShadow
+      >
+        <boxGeometry args={[0.1, 0.1, 2]} />
+      </mesh>
+    </RigidBody>
+  );
+}
 
 function App() {
+  // bullet would be created by the bullet
+  const [bullets, setBullets] = useState([]);
+
+  // this will be implement by the player
+  const shoot = (bullet) => {
+    setBullets((bullets) => [...bullets, bullet]);
+    if (bullets.length === 10) {
+      setBullets([]);
+    }
+  };
+
+  const onHit = (bulletID) => {
+    // then remove the bullet
+    setBullets((bullets) => [
+      ...bullets.filter(({ id }) => id !== bulletID), //10 is the fire-rate
+    ]);
+  };
+
   return (
     <KeyboardControls
       map={[
@@ -125,7 +202,9 @@ function App() {
             <Ground />
             <Coins />
             <Room x={50} z={50} size={[10, 20]} />
-
+            {bullets.map((b) => (
+              <Bullet bulletInfo={b} onHit={onHit} />
+            ))}
             <RigidBody type="fixed" colliders={"cuboid"}>
               <mesh
                 receiveShadow
@@ -139,15 +218,12 @@ function App() {
                   decay={1}
                 />
                 <boxGeometry args={[5, 5, 0.1]} />
-                <meshStandardMaterial color="hotpink" />
+                <meshStandardMaterial color="#fff" />
               </mesh>
             </RigidBody>
-
             <Room z={0} x={0} size={[30, 30]} />
-
-            <Player />
+            <Player shoot={shoot} />
           </Physics>
-          <PointerLockControls />
         </Canvas>
       </Suspense>
     </KeyboardControls>
