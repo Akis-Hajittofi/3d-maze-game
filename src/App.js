@@ -6,8 +6,8 @@ import { CuboidCollider, Physics, RigidBody } from "@react-three/rapier";
 import Player from "./Components/Player";
 import Coin from "./Components/Coin";
 
-function Wall({ position, rotation, color = "gray", l = 30 }) {
-  let wallDepth = 1;
+function Wall({ position, rotation, color = "black", l = 30 }) {
+  let wallDepth = 3;
   return (
     <RigidBody type="fixed" colliders={"cuboid"}>
       <mesh rotation={rotation} position={position}>
@@ -18,35 +18,43 @@ function Wall({ position, rotation, color = "gray", l = 30 }) {
   );
 }
 
-function WallWithDoor({ position, rotation, color = "gray" }) {
-  const offset = 8.5;
-  const width = 12;
+function WallWithDoor({ position, rotation, color = "black", l = 30 }) {
+  // Send the xLength or zLength here from Room
+  // Door must always be a width of 5
+  // Work out the appropriate lengths of leftWall and rightWall and send to Wall
+
+  let wallDepth = 3;
+  console.log(l, position);
+
+  const width = (l - 5) / 2 + wallDepth / 2;
+
+  const offset = l / 2 - width / 2 + wallDepth / 2;
+  // const offset = l / 2 - width / 2 + 0.25;
   let leftWall = [position[0] - offset, position[1], position[2]];
   let topWall = [position[0], position[1] + 5, position[2]];
   let rightWall = [position[0] + offset, position[1], position[2]];
   return (
-    <mesh>
+    <>
       <RigidBody type="fixed" colliders={"cuboid"}>
-        <mesh position={leftWall}>
-          <boxGeometry args={[width, 15, 1]} />
+        <mesh rotation={rotation} position={leftWall}>
+          <boxGeometry args={[width, 15, wallDepth]} />
+          <meshStandardMaterial color={color} />
+        </mesh>
+      </RigidBody>
+      <RigidBody type="fixed" colliders={"cuboid"}>
+        <mesh rotation={rotation} position={topWall}>
+          <boxGeometry args={[5, 5, wallDepth]} />
           <meshStandardMaterial color={"red"} />
         </mesh>
       </RigidBody>
 
       <RigidBody type="fixed" colliders={"cuboid"}>
-        <mesh position={topWall}>
-          <boxGeometry args={[5, 5, 1]} />
-          <meshStandardMaterial color={"yellow"} />
+        <mesh rotation={rotation} position={rightWall}>
+          <boxGeometry args={[width, 15, wallDepth]} />
+          <meshStandardMaterial color={color} />
         </mesh>
       </RigidBody>
-
-      <RigidBody type="fixed" colliders={"cuboid"}>
-        <mesh position={rightWall}>
-          <boxGeometry args={[width, 15, 1]} />
-          <meshStandardMaterial color={"green"} />
-        </mesh>
-      </RigidBody>
-    </mesh>
+    </>
   );
 }
 function Room({ x, z, size, doors = [0, 0, 0, 0] }) {
@@ -54,14 +62,18 @@ function Room({ x, z, size, doors = [0, 0, 0, 0] }) {
 
   return (
     <>
-      <Wall position={[xLength / 2 + x, 3, 0 + z]} l={xLength} color={"red"} />
+      <WallWithDoor position={[xLength / 2 + x, 3, 0 + z]} l={xLength} />
       <Wall
         position={[0 + x, 3, zLength / 2 + z]}
         rotation={[0, Math.PI / 2, 0]}
         l={zLength}
         color={"lime"}
       />
-      <Wall position={[xLength / 2 + x, 3, zLength + z]} l={xLength} />
+      <Wall
+        position={[xLength / 2 + x, 3, zLength + z]}
+        l={xLength}
+        color={"red"}
+      />
       <Wall
         position={[xLength + x, 3, zLength / 2 + z]}
         rotation={[0, Math.PI / 2, 0]}
@@ -132,7 +144,7 @@ function App() {
             <Sky sunPosition={[100, 20, 100]} />
             <Ground />
             <Coins />
-            <Room x={50} z={50} size={[20, 20]} />
+            <Room x={50} z={50} size={[60, 40]} />
 
             <RigidBody type="fixed" colliders={"cuboid"}>
               <mesh
@@ -151,7 +163,7 @@ function App() {
               </mesh>
             </RigidBody>
 
-            <Room z={0} x={0} size={[40, 30]} />
+            <Room z={0} x={0} size={[40, 40]} />
 
             <Player />
           </Physics>
