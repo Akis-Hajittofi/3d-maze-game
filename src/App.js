@@ -30,31 +30,31 @@ function WallWithDoor({ position, rotation, color = "black", l = 30 }) {
 
   const offset = l / 2 - width / 2 + wallDepth / 2;
   // const offset = l / 2 - width / 2 + 0.25;
-  let leftWall = [position[0] - offset, position[1], position[2]];
-  let topWall = [position[0], position[1] + 5, position[2]];
-  let rightWall = [position[0] + offset, position[1], position[2]];
+  let leftWall = [0 - offset, 0, 0];
+  let topWall = [0, 0 + 5, 0];
+  let rightWall = [0 + offset, 0, 0];
   return (
-    <>
+    <group rotation={rotation} position={position}>
       <RigidBody type="fixed" colliders={"cuboid"}>
-        <mesh rotation={rotation} position={leftWall}>
+        <mesh position={leftWall}>
           <boxGeometry args={[width, 15, wallDepth]} />
           <meshStandardMaterial color={color} />
         </mesh>
       </RigidBody>
       <RigidBody type="fixed" colliders={"cuboid"}>
-        <mesh rotation={rotation} position={topWall}>
+        <mesh position={topWall}>
           <boxGeometry args={[5, 5, wallDepth]} />
           <meshStandardMaterial color={"red"} />
         </mesh>
       </RigidBody>
 
       <RigidBody type="fixed" colliders={"cuboid"}>
-        <mesh rotation={rotation} position={rightWall}>
+        <mesh position={rightWall}>
           <boxGeometry args={[width, 15, wallDepth]} />
           <meshStandardMaterial color={color} />
         </mesh>
       </RigidBody>
-    </>
+    </group>
   );
 }
 function Room({ x, z, size, doors = [0, 0, 0, 0] }) {
@@ -62,29 +62,22 @@ function Room({ x, z, size, doors = [0, 0, 0, 0] }) {
 
   return (
     <>
-      <WallWithDoor position={[xLength / 2 + x, 3, 0 + z]} l={xLength} />
-      <Wall
-        position={[0 + x, 3, zLength / 2 + z]}
+      <WallWithDoor position={[x, 3, z - zLength / 2]} l={xLength} />
+      <WallWithDoor
+        position={[x + xLength / 2, 3, z]}
         rotation={[0, Math.PI / 2, 0]}
         l={zLength}
         color={"lime"}
       />
-      <Wall
-        position={[xLength / 2 + x, 3, zLength + z]}
-        l={xLength}
-        color={"red"}
-      />
-      <Wall
-        position={[xLength + x, 3, zLength / 2 + z]}
+      <WallWithDoor position={[x, 3, z + zLength / 2]} l={xLength} />
+      <WallWithDoor
+        position={[x - xLength / 2, 3, z]}
         rotation={[0, Math.PI / 2, 0]}
         l={zLength}
-        color={"purple"}
+        color={"lime"}
       />
-      <mesh
-        receiveShadow
-        position={[xLength / 2 + x, 0, xLength / 2 + z]}
-        rotation-x={Math.PI / 2}
-      >
+
+      <mesh receiveShadow position={[0, 0, 0]} rotation-x={Math.PI / 2}>
         <boxGeometry args={[1, 1, 1]} />
         <meshStandardMaterial color="green" />
       </mesh>
@@ -144,8 +137,7 @@ function App() {
             <Sky sunPosition={[100, 20, 100]} />
             <Ground />
             <Coins />
-            <Room x={50} z={50} size={[60, 40]} />
-
+            <Room x={50} z={50} size={[60, 50]} />
             <RigidBody type="fixed" colliders={"cuboid"}>
               <mesh
                 receiveShadow
@@ -162,9 +154,7 @@ function App() {
                 <meshStandardMaterial color="hotpink" />
               </mesh>
             </RigidBody>
-
             <Room z={0} x={0} size={[40, 40]} />
-
             <Player />
           </Physics>
           <PointerLockControls />
