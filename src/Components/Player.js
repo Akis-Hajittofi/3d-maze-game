@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { PointerLockControls, useKeyboardControls } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { CapsuleCollider, RigidBody, quat, vec3 } from "@react-three/rapier";
@@ -46,6 +46,7 @@ const Player = ({ shoot }) => {
   const [, get] = useKeyboardControls();
   const lastShoot = useRef(0);
   lastShoot.current = Date.now();
+
   useFrame((state) => {
     const controls = get();
     if (player?.current) {
