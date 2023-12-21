@@ -6,12 +6,11 @@ import { CuboidCollider, Physics, RigidBody } from "@react-three/rapier";
 import Player from "./Components/Player";
 import Coin from "./Components/Coin";
 
-function Wall({ position, rotation, color = "black", l = 30 }) {
-  let wallDepth = 3;
+function Wall({ position, width = 5, height, depth, color = "black" }) {
   return (
     <RigidBody type="fixed" colliders={"cuboid"}>
-      <mesh rotation={rotation} position={position}>
-        <boxGeometry args={[l + wallDepth, 15, wallDepth]} />
+      <mesh position={position}>
+        <boxGeometry args={[width, height, depth]} />
         <meshStandardMaterial color={color} />
       </mesh>
     </RigidBody>
@@ -19,44 +18,41 @@ function Wall({ position, rotation, color = "black", l = 30 }) {
 }
 
 function WallWithDoor({ position, rotation, color = "black", l = 30 }) {
-  // Send the xLength or zLength here from Room
-  // Door must always be a width of 5
-  // Work out the appropriate lengths of leftWall and rightWall and send to Wall
+  const depth = 3;
+  const sideWallWidth = (l - 5) / 2 + depth / 2;
+  const offset = l / 2 - sideWallWidth / 2 + depth / 2;
 
-  let wallDepth = 3;
-  console.log(l, position);
+  const leftWall = [0 - offset, 0, 0];
+  const topWall = [0, 0 + 5, 0];
+  const rightWall = [0 + offset, 0, 0];
 
-  const width = (l - 5) / 2 + wallDepth / 2;
-
-  const offset = l / 2 - width / 2 + wallDepth / 2;
-  // const offset = l / 2 - width / 2 + 0.25;
-  let leftWall = [0 - offset, 0, 0];
-  let topWall = [0, 0 + 5, 0];
-  let rightWall = [0 + offset, 0, 0];
   return (
     <group rotation={rotation} position={position}>
-      <RigidBody type="fixed" colliders={"cuboid"}>
-        <mesh position={leftWall}>
-          <boxGeometry args={[width, 15, wallDepth]} />
-          <meshStandardMaterial color={color} />
-        </mesh>
-      </RigidBody>
-      <RigidBody type="fixed" colliders={"cuboid"}>
-        <mesh position={topWall}>
-          <boxGeometry args={[5, 5, wallDepth]} />
-          <meshStandardMaterial color={"red"} />
-        </mesh>
-      </RigidBody>
-
-      <RigidBody type="fixed" colliders={"cuboid"}>
-        <mesh position={rightWall}>
-          <boxGeometry args={[width, 15, wallDepth]} />
-          <meshStandardMaterial color={color} />
-        </mesh>
-      </RigidBody>
+      <Wall
+        position={leftWall}
+        width={sideWallWidth}
+        height={15}
+        depth={depth}
+        color={"purple"}
+      />
+      <Wall
+        position={topWall}
+        width={5}
+        height={5}
+        depth={depth}
+        color={"red"}
+      />
+      <Wall
+        position={rightWall}
+        width={sideWallWidth}
+        height={15}
+        depth={depth}
+        color={"lime"}
+      />
     </group>
   );
 }
+
 function Room({ x, z, size, doors = [0, 0, 0, 0] }) {
   let [xLength, zLength] = size;
 
