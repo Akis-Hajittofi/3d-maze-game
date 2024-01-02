@@ -7,33 +7,85 @@ import Player from "./Components/Player";
 import Coin from "./Components/Coin";
 
 function Wall({ position, width = 5, height, depth, color = "black" }) {
-  return (
-    <RigidBody type="fixed" colliders={"cuboid"}>
+  const wall = (
+    <RigidBody type={"fixed"} colliders={"cuboid"}>
       <mesh position={position}>
         <boxGeometry args={[width, height, depth]} />
         <meshStandardMaterial color={color} />
       </mesh>
     </RigidBody>
   );
+  // console.log(wall.getWorldPosition());
+  return <>{wall}</>;
 }
+
+function Passage({
+  position,
+  rotation,
+  offset = 0,
+  color = "white",
+  l = 70,
+  depth,
+}) {
+  const width = l;
+  return (
+    // <group rotation={rotation} position={[0, 0, l / 2 + depth / 2]}>
+    <group rotation={rotation} position={position}>
+      <Wall
+        position={[0 + offset, 3, 0]}
+        width={width}
+        height={15}
+        depth={depth}
+        color={"black"}
+      />
+
+      <Wall
+        position={[0 + offset, 3, 10]}
+        width={width}
+        height={15}
+        depth={depth}
+        color={"orange"}
+      />
+    </group>
+  );
+}
+
+// A function that renders the passage based on the position from room1 to room2
+const GeneratePassage = ({
+  room1 = { x: 0, z: 0, size: [80, 80] },
+  room2 = { x: 200, z: 0, size: [80, 80] },
+}) => {
+  const depth = 3;
+  const length =
+    room2.x - room1.x - room2.size[0] / 2 - room1.size[0] / 2 - depth;
+
+  return (
+    <Passage
+      position={[room1.x, 0, room1.z - 5]}
+      l={length}
+      offset={(length + room1.size[0] + depth) / 2}
+      depth={depth}
+    />
+  );
+};
 
 function WallWithDoor({ position, rotation, color = "black", l = 30 }) {
   const depth = 3;
-  const sideWallWidth = (l - 5) / 2 + depth / 2;
-  const offset = l / 2 - sideWallWidth / 2 + depth / 2;
+  const roomWidth = (l - 5) / 2 + depth / 2;
+  const offset = l / 2 - roomWidth / 2 + depth / 2;
 
   const leftWall = [0 - offset, 0, 0];
-  const topWall = [0, 0 + 5, 0];
+  const topWall = [0, 5, 0];
   const rightWall = [0 + offset, 0, 0];
 
   return (
     <group rotation={rotation} position={position}>
       <Wall
         position={leftWall}
-        width={sideWallWidth}
+        width={roomWidth}
         height={15}
         depth={depth}
-        color={"purple"}
+        color={color}
       />
       <Wall
         position={topWall}
@@ -44,10 +96,10 @@ function WallWithDoor({ position, rotation, color = "black", l = 30 }) {
       />
       <Wall
         position={rightWall}
-        width={sideWallWidth}
+        width={roomWidth}
         height={15}
         depth={depth}
-        color={"lime"}
+        color={color}
       />
     </group>
   );
@@ -58,19 +110,28 @@ function Room({ x, z, size, doors = [0, 0, 0, 0] }) {
 
   return (
     <>
-      <WallWithDoor position={[x, 3, z - zLength / 2]} l={xLength} />
+      <WallWithDoor
+        position={[x, 3, z - zLength / 2]}
+        rotation={[0, (6 * Math.PI) / 2, 0]}
+        l={xLength}
+        color={"yellow"}
+      />
       <WallWithDoor
         position={[x + xLength / 2, 3, z]}
         rotation={[0, Math.PI / 2, 0]}
         l={zLength}
         color={"lime"}
       />
-      <WallWithDoor position={[x, 3, z + zLength / 2]} l={xLength} />
+      <WallWithDoor
+        position={[x, 3, z + zLength / 2]}
+        l={xLength}
+        color={"blue"}
+      />
       <WallWithDoor
         position={[x - xLength / 2, 3, z]}
-        rotation={[0, Math.PI / 2, 0]}
+        rotation={[0, (3 * Math.PI) / 2, 0]}
         l={zLength}
-        color={"lime"}
+        color={"white"}
       />
 
       <mesh receiveShadow position={[0, 0, 0]} rotation-x={Math.PI / 2}>
@@ -109,6 +170,13 @@ function Coins() {
 }
 
 function App() {
+  const room1 = { x: 0, z: 0, size: [80, 80] };
+  const room2 = { x: 200, z: 0, size: [30, 30] };
+  const room3 = { x: -300, z: 0, size: [50, 50] };
+  const room4 = { x: -150, z: 0, size: [70, 70] };
+
+  const rooms = [room1, room2, room3, room4];
+
   return (
     <KeyboardControls
       map={[
@@ -133,7 +201,6 @@ function App() {
             <Sky sunPosition={[100, 20, 100]} />
             <Ground />
             <Coins />
-            <Room x={50} z={50} size={[60, 50]} />
             <RigidBody type="fixed" colliders={"cuboid"}>
               <mesh
                 receiveShadow
@@ -150,7 +217,13 @@ function App() {
                 <meshStandardMaterial color="hotpink" />
               </mesh>
             </RigidBody>
-            <Room z={0} x={0} size={[40, 40]} />
+
+            {rooms.map((room, index) => (
+              <Room x={room.x} z={room.z} size={room.size} key={index} />
+            ))}
+            <GeneratePassage room1={room1} room2={room2} />
+            <GeneratePassage room1={room3} room2={room4} />
+
             <Player />
           </Physics>
           <PointerLockControls />
