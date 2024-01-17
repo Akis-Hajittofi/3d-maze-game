@@ -7,35 +7,140 @@ import Player from "./Components/Player";
 import Coin from "./Components/Coin";
 import Bullet from "./Components/Bullet";
 
+
 function Wall({ position, width = 5, height, depth, color = "#0F172A" }) {
   return (
     <RigidBody type="fixed" colliders={"cuboid"}>
+
       <mesh position={position}>
         <boxGeometry args={[width, height, depth]} />
         <meshStandardMaterial color={color} />
       </mesh>
     </RigidBody>
   );
+  // console.log(wall.getWorldPosition());
+  return <>{wall}</>;
+}
+
+function Passage({
+  position,
+  rotation,
+  offset = 0,
+  color = "white",
+  l = 70,
+  depth,
+}) {
+  const width = l;
+  return (
+    // <group rotation={rotation} position={[0, 0, l / 2 + depth / 2]}>
+    <group rotation={rotation} position={position}>
+      <Wall
+        position={[0 + offset, 3, -4]}
+        width={width}
+        height={15}
+        depth={depth}
+        color={"black"}
+      />
+
+      <Wall
+        position={[0 + offset, 3, 4]}
+        width={width}
+        height={15}
+        depth={depth}
+        color={"orange"}
+      />
+    </group>
+  );
 }
 
 
+// A function that renders the passage based on the position from room1 to room2
+const GeneratePassage = ({ room1, room2 }) => {
+  // const room1 = { x: 0, z: 0, size: [80, 80] };
+  // const room2 = { x: 200, z: 0, size: [30, 30] };
+  const depth = 3;
+  let roomDifference;
+  let startingPositionX = room2.x;
+  let startingPositionZ = room1.z;
+  let roomSize;
+  let length;
+  let rotation;
+
+  if (room1.z === room2.z) {
+    if (room1.x < room2.x) {
+      roomDifference = room2.x - room1.x;
+      startingPositionX = room1.x;
+      roomSize = room1.size[0];
+      length = roomDifference - room2.size[0] / 2 - room1.size[0] / 2 - depth;
+    } else if (room1.x > room2.x) {
+      roomDifference = room1.x - room2.x;
+      startingPositionX = room2.x;
+      roomSize = room2.size[0];
+      length = roomDifference - room2.size[0] / 2 - room1.size[0] / 2 - depth;
+    }
+  } else if (room1.x === room2.x) {
+    if (room1.z < room2.z) {
+      roomDifference = room2.z - room1.z;
+      startingPositionZ = room1.z;
+      roomSize = room1.size[1];
+      length = roomDifference - room2.size[1] / 2 - room1.size[1] / 2 - depth;
+    } else if (room1.z > room2.z) {
+      roomDifference = room1.z - room2.z;
+      startingPositionZ = room2.z;
+      roomSize = room2.size[1];
+      length = roomDifference - room2.size[1] / 2 - room1.size[1] / 2 - depth;
+    }
+    rotation = [0, (3 * Math.PI) / 2, 0];
+  }
+
+  // length = roomDifference - room2.size[0] / 2 - room1.size[0] / 2 - depth;
+
+  return (
+    <Passage
+      position={[startingPositionX, 0, startingPositionZ]}
+      l={length}
+      offset={(length + roomSize + depth) / 2}
+      depth={depth}
+      rotation={rotation}
+    />
+  );
+};
+
+// const GeneratePassage = ({ room1, room2 }) => {
+//   // const room1 = { x: 200, z: 0, size: [80, 80] };
+//   // const room2 = { x: 0, z: 0, size: [30, 30] };
+
+//   const depth = 3;
+//   const length =
+//     room1.x - room2.x - room2.size[0] / 2 - room1.size[0] / 2 - depth;
+
+//   return (
+//     <Passage
+//       position={[room2.x, 0, room1.z - 5]}
+//       l={length}
+//       offset={(length + room2.size[0] + depth) / 2}
+//       depth={depth}
+//     />
+//   );
+// };
+
 function WallWithDoor({ position, rotation, color = "#0F172A", l = 30 }) {
   const depth = 3;
-  const sideWallWidth = (l - 5) / 2 + depth / 2;
-  const offset = l / 2 - sideWallWidth / 2 + depth / 2;
+  const roomWidth = (l - 5) / 2 + depth / 2;
+  const offset = l / 2 - roomWidth / 2 + depth / 2;
 
   const leftWall = [0 - offset, 0, 0];
-  const topWall = [0, 0 + 5, 0];
+  const topWall = [0, 5, 0];
   const rightWall = [0 + offset, 0, 0];
 
   return (
     <group rotation={rotation} position={position}>
       <Wall
         position={leftWall}
-        width={sideWallWidth}
+        width={roomWidth}
         height={15}
         depth={depth}
-        color={"purple"}
+        color={color}
       />
       <Wall
         position={topWall}
@@ -46,40 +151,49 @@ function WallWithDoor({ position, rotation, color = "#0F172A", l = 30 }) {
       />
       <Wall
         position={rightWall}
-        width={sideWallWidth}
+        width={roomWidth}
         height={15}
         depth={depth}
-        color={"lime"}
+        color={color}
       />
     </group>
   );
 }
 
-function Room({ x, z, size, doors = [0, 0, 0, 0] }) {
+function Room({ x, z, size, doors = [0, 0, 0, 0], color }) {
   let [xLength, zLength] = size;
 
   return (
-    <>
-      <WallWithDoor position={[x, 3, z - zLength / 2]} l={xLength} />
+    <group color={color}>
+      <WallWithDoor
+        position={[x, 3, z - zLength / 2]}
+        rotation={[0, (6 * Math.PI) / 2, 0]}
+        l={xLength}
+        color={color}
+      />
       <WallWithDoor
         position={[x + xLength / 2, 3, z]}
         rotation={[0, Math.PI / 2, 0]}
         l={zLength}
-        color={"lime"}
+        color={color}
       />
-      <WallWithDoor position={[x, 3, z + zLength / 2]} l={xLength} />
+      <WallWithDoor
+        position={[x, 3, z + zLength / 2]}
+        l={xLength}
+        color={color}
+      />
       <WallWithDoor
         position={[x - xLength / 2, 3, z]}
-        rotation={[0, Math.PI / 2, 0]}
+        rotation={[0, (3 * Math.PI) / 2, 0]}
         l={zLength}
-        color={"lime"}
+        color={color}
       />
 
       <mesh receiveShadow position={[0, 0, 0]} rotation-x={Math.PI / 2}>
         <boxGeometry args={[1, 1, 1]} />
         <meshStandardMaterial color="green" />
       </mesh>
-    </>
+    </group>
   );
 }
 
@@ -140,6 +254,15 @@ function Box(props) {
 }
 
 function App() {
+
+  const room1 = { x: 0, z: 0, size: [100, 50], color: "red" };
+  const room2 = { x: 0, z: 200, size: [60, 30], color: "yellow" };
+  const room3 = { x: -300, z: -150, size: [50, 50], color: "lime" };
+  const room4 = { x: -300, z: 0, size: [100, 70], color: "purple" };
+  const room5 = { x: 0, z: -200, size: [70, 70], color: "orange" };
+
+  const rooms = [room1, room2, room3, room4, room5];
+
   // bullet would be created by the bullet
   const [bullets, setBullets] = useState([]);
 
@@ -183,7 +306,6 @@ function App() {
             <Coins />
             <Room x={50} z={50} size={[60, 50]} />
             <Bullets bullets={bullets} setBullets={setBullets} />
-
             <RigidBody type="fixed" colliders={"cuboid"}>
               <mesh
                 receiveShadow
@@ -200,10 +322,24 @@ function App() {
                 <meshStandardMaterial color="#fff" />
               </mesh>
             </RigidBody>
-            <Room z={0} x={0} size={[40, 40]} />
+
+            {rooms.map((room, index) => (
+              <Room
+                x={room.x}
+                z={room.z}
+                size={room.size}
+                key={index}
+                color={room.color}
+              />
+            ))}
+            
+            <GeneratePassage room1={room1} room2={room2} />
+            <GeneratePassage room1={room3} room2={room4} />
+            <GeneratePassage room1={room1} room2={room4} />
+            <GeneratePassage room1={room5} room2={room1} />
+              
             <Player shoot={shoot} />
             <Box position={[1, 3, 1]} />
-
           </Physics>
         </Canvas>
       </Suspense>
