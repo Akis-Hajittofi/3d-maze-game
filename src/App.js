@@ -7,19 +7,15 @@ import Player from "./Components/Player";
 import Coin from "./Components/Coin";
 import Bullet from "./Components/Bullet";
 
-
 function Wall({ position, width = 5, height, depth, color = "#0F172A" }) {
   return (
     <RigidBody type="fixed" colliders={"cuboid"}>
-
       <mesh position={position}>
         <boxGeometry args={[width, height, depth]} />
         <meshStandardMaterial color={color} />
       </mesh>
     </RigidBody>
   );
-  // console.log(wall.getWorldPosition());
-  return <>{wall}</>;
 }
 
 function Passage({
@@ -52,7 +48,6 @@ function Passage({
     </group>
   );
 }
-
 
 // A function that renders the passage based on the position from room1 to room2
 const GeneratePassage = ({ room1, room2 }) => {
@@ -254,7 +249,6 @@ function Box(props) {
 }
 
 function App() {
-
   const room1 = { x: 0, z: 0, size: [100, 50], color: "red" };
   const room2 = { x: 0, z: 200, size: [60, 30], color: "yellow" };
   const room3 = { x: -300, z: -150, size: [50, 50], color: "lime" };
@@ -304,7 +298,7 @@ function App() {
             <Sky sunPosition={[100, 20, 100]} />
             <Ground />
             <Coins />
-            <Room x={50} z={50} size={[60, 50]} />
+            {/* <Room x={50} z={50} size={[60, 50]} /> */}
             <Bullets bullets={bullets} setBullets={setBullets} />
             <RigidBody type="fixed" colliders={"cuboid"}>
               <mesh
@@ -332,12 +326,12 @@ function App() {
                 color={room.color}
               />
             ))}
-            
+
             <GeneratePassage room1={room1} room2={room2} />
             <GeneratePassage room1={room3} room2={room4} />
             <GeneratePassage room1={room1} room2={room4} />
             <GeneratePassage room1={room5} room2={room1} />
-              
+
             <Player shoot={shoot} />
             <Box position={[1, 3, 1]} />
           </Physics>
