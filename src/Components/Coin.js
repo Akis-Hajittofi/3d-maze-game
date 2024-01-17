@@ -36,10 +36,15 @@ const Coin = ({ x = 5, z = 5, setCoins, id }) => {
         }}
       >
         <mesh rotation={[Math.PI / 2, 0, 0]} position={[x, 0, z]}>
-          <pointLight intensity={1} distance={5} decay={1.5} color={"gold"} />
+          <pointLight
+            intensity={1}
+            distance={5}
+            decay={1.5}
+            color={"#F4BF50"}
+          />
           <cylinderGeometry args={[0.2, 0.2, 0.1]} />
           <meshStandardMaterial
-            color={"gold"}
+            color={"#F4BF50"}
             roughness={0.4}
             metalness={0.1}
           />
