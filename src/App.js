@@ -7,65 +7,75 @@ import Player from "./Components/Player";
 import Coin from "./Components/Coin";
 import Bullet from "./Components/Bullet";
 
-function Wall({ position, rotation, color = "#0F172A", l = 30 }) {
-  let wallDepth = 0.5;
+function Wall({ position, width = 5, height, depth, color = "#0F172A" }) {
   return (
     <RigidBody type="fixed" colliders={"cuboid"}>
-      <mesh rotation={rotation} position={position}>
-        <boxGeometry args={[l + wallDepth, 15, wallDepth]} />
+      <mesh position={position}>
+        <boxGeometry args={[width, height, depth]} />
         <meshStandardMaterial color={color} />
       </mesh>
     </RigidBody>
   );
 }
 
-function WallWithDoor({ position, rotation, color = "gray" }) {
-  const offset = 8.5;
-  const width = 12;
-  let leftWall = [position[0] - offset, position[1], position[2]];
-  let topWall = [position[0], position[1] + 5, position[2]];
-  let rightWall = [position[0] + offset, position[1], position[2]];
+
+function WallWithDoor({ position, rotation, color = "#0F172A", l = 30 }) {
+  const depth = 3;
+  const sideWallWidth = (l - 5) / 2 + depth / 2;
+  const offset = l / 2 - sideWallWidth / 2 + depth / 2;
+
+  const leftWall = [0 - offset, 0, 0];
+  const topWall = [0, 0 + 5, 0];
+  const rightWall = [0 + offset, 0, 0];
+
   return (
-    <mesh>
-      <RigidBody type="fixed" colliders={"cuboid"}>
-        <mesh position={leftWall}>
-          <boxGeometry args={[width, 15, 1]} />
-          <meshStandardMaterial color={"red"} />
-        </mesh>
-      </RigidBody>
-
-      <RigidBody type="fixed" colliders={"cuboid"}>
-        <mesh position={topWall}>
-          <boxGeometry args={[5, 5, 1]} />
-          <meshStandardMaterial color={"yellow"} />
-        </mesh>
-      </RigidBody>
-
-      <RigidBody type="fixed" colliders={"cuboid"}>
-        <mesh position={rightWall}>
-          <boxGeometry args={[width, 15, 1]} />
-          <meshStandardMaterial color={"green"} />
-        </mesh>
-      </RigidBody>
-    </mesh>
+    <group rotation={rotation} position={position}>
+      <Wall
+        position={leftWall}
+        width={sideWallWidth}
+        height={15}
+        depth={depth}
+        color={"purple"}
+      />
+      <Wall
+        position={topWall}
+        width={5}
+        height={5}
+        depth={depth}
+        color={"red"}
+      />
+      <Wall
+        position={rightWall}
+        width={sideWallWidth}
+        height={15}
+        depth={depth}
+        color={"lime"}
+      />
+    </group>
   );
 }
+
 function Room({ x, z, size, doors = [0, 0, 0, 0] }) {
   let [xLength, zLength] = size;
-  // change the length of the wall based on the size
-  x += -15;
-  z += -15;
+
   return (
     <>
-      <Wall position={[15 + x, 3, 0 + z]} />
-      <Wall position={[0 + x, 3, 15 + z]} rotation={[0, Math.PI / 2, 0]} />
-      <Wall position={[15 + x, 3, 30 + z]} />
-      <Wall position={[30 + x, 3, 15 + z]} rotation={[0, Math.PI / 2, 0]} />
-      <mesh
-        receiveShadow
-        position={[x + 15, 0, z + 15]}
-        rotation-x={Math.PI / 2}
-      >
+      <WallWithDoor position={[x, 3, z - zLength / 2]} l={xLength} />
+      <WallWithDoor
+        position={[x + xLength / 2, 3, z]}
+        rotation={[0, Math.PI / 2, 0]}
+        l={zLength}
+        color={"lime"}
+      />
+      <WallWithDoor position={[x, 3, z + zLength / 2]} l={xLength} />
+      <WallWithDoor
+        position={[x - xLength / 2, 3, z]}
+        rotation={[0, Math.PI / 2, 0]}
+        l={zLength}
+        color={"lime"}
+      />
+
+      <mesh receiveShadow position={[0, 0, 0]} rotation-x={Math.PI / 2}>
         <boxGeometry args={[1, 1, 1]} />
         <meshStandardMaterial color="green" />
       </mesh>
@@ -171,8 +181,9 @@ function App() {
             <Sky sunPosition={[100, 20, 100]} />
             <Ground />
             <Coins />
-            <Room x={50} z={50} size={[10, 20]} />
+            <Room x={50} z={50} size={[60, 50]} />
             <Bullets bullets={bullets} setBullets={setBullets} />
+
             <RigidBody type="fixed" colliders={"cuboid"}>
               <mesh
                 receiveShadow
@@ -189,9 +200,10 @@ function App() {
                 <meshStandardMaterial color="#fff" />
               </mesh>
             </RigidBody>
-            <Room z={0} x={0} size={[30, 30]} />
+            <Room z={0} x={0} size={[40, 40]} />
             <Player shoot={shoot} />
             <Box position={[1, 3, 1]} />
+
           </Physics>
         </Canvas>
       </Suspense>
