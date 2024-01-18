@@ -9,6 +9,7 @@ import Bullet from "./Components/Bullet";
 import Ground from "./Components/Ground";
 import Room from "./Components/Room";
 import Passage from "./Components/Passages";
+import useStore from "./store";
 
 function Coins() {
   const [coins, setCoins] = useState([]);
@@ -49,14 +50,6 @@ function Box(props) {
 }
 
 function App() {
-  const room1 = { x: 0, z: 0, size: [100, 50], color: "red" };
-  const room2 = { x: 0, z: 200, size: [60, 30], color: "yellow" };
-  const room3 = { x: -300, z: -150, size: [50, 50], color: "lime" };
-  const room4 = { x: -300, z: 0, size: [100, 70], color: "purple" };
-  const room5 = { x: 0, z: -200, size: [70, 70], color: "orange" };
-
-  const rooms = [room1, room2, room3, room4, room5];
-
   // bullet would be created by the bullet
   const [bullets, setBullets] = useState([]);
 
@@ -68,6 +61,7 @@ function App() {
     }
   };
 
+  console.log(useStore.getState().passages);
   return (
     <KeyboardControls
       map={[
@@ -117,20 +111,8 @@ function App() {
               </mesh>
             </RigidBody>
 
-            {rooms.map((room, index) => (
-              <Room
-                x={room.x}
-                z={room.z}
-                size={room.size}
-                key={index}
-                color={room.color}
-              />
-            ))}
-
-            <Passage room1={room1} room2={room2} />
-            <Passage room1={room3} room2={room4} />
-            <Passage room1={room1} room2={room4} />
-            <Passage room1={room5} room2={room1} />
+            {useStore.getState().rooms}
+            {useStore.getState().passages}
 
             <Player shoot={shoot} />
             <Box position={[1, 3, 1]} />
