@@ -36,8 +36,12 @@ function Bullet({ bulletInfo, onHit }) {
       gravityScale={0}
       sensor
       onIntersectionEnter={({ other }) => {
-        if (other.rigidBodyObject.name !== "player") {
+        if (
+          other.rigidBodyObject.name !== "player" &&
+          other.rigidBodyObject.name !== "sensor"
+        ) {
           console.log(other.rigidBodyObject);
+          // will remove the bullet
           onHit(bulletInfo.id);
         }
       }}
