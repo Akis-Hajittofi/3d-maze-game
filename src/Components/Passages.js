@@ -18,7 +18,7 @@ function PassageComponent({
         width={width}
         height={15}
         depth={depth}
-        color={"black"}
+        color={"orange"}
       />
 
       <Wall

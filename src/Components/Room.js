@@ -1,7 +1,7 @@
 import React from "react";
 import Wall from "./Wall";
 
-function WallWithDoor({ position, rotation, color = "#0F172A", l = 30 }) {
+function WallWithDoor({ position, rotation, color, l = 30 }) {
   const depth = 3;
   const roomWidth = (l - 5) / 2 + depth / 2;
   const offset = l / 2 - roomWidth / 2 + depth / 2;
@@ -24,7 +24,7 @@ function WallWithDoor({ position, rotation, color = "#0F172A", l = 30 }) {
         width={5}
         height={5}
         depth={depth}
-        color={"red"}
+        color={color}
       />
       <Wall
         position={rightWall}
@@ -68,7 +68,7 @@ function Room({ x, z, size, doors = [0, 0, 0, 0], color }) {
 
       <mesh receiveShadow position={[0, 0, 0]} rotation-x={Math.PI / 2}>
         <boxGeometry args={[1, 1, 1]} />
-        <meshStandardMaterial color="green" />
+        <meshStandardMaterial color={color} />
       </mesh>
     </group>
   );

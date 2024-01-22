@@ -2,12 +2,14 @@ import { create } from "zustand";
 import Passage from "./Components/Passages";
 import Room from "./Components/Room";
 
+let c = "#1a273a";
+
 let roomsConfig = [
-  { name: "room1", x: 0, z: 0, size: [100, 50], color: "red" },
-  { name: "room2", x: 0, z: 200, size: [60, 30], color: "yellow" },
-  { name: "room3", x: -300, z: -150, size: [50, 50], color: "lime" },
-  { name: "room4", x: -300, z: 0, size: [100, 70], color: "purple" },
-  { name: "room5", x: 0, z: -200, size: [70, 70], color: "orange" },
+  { name: "room1", x: 0, z: 0, size: [100, 50], color: c },
+  { name: "room2", x: 0, z: 200, size: [60, 30], color: c },
+  { name: "room3", x: -300, z: -150, size: [50, 50], color: c },
+  { name: "room4", x: -300, z: 0, size: [100, 70], color: c },
+  { name: "room5", x: 0, z: -200, size: [70, 70], color: c },
 ];
 
 const useStore = create((set) => ({

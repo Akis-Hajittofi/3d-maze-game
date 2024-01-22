@@ -53,7 +53,6 @@ function Enemy(props) {
         );
       } else {
         goTo = randomPosition(size, size);
-        console.log(currentPosition, goTo);
       }
     }
     if (refPlayer?.current) {
