@@ -111,7 +111,10 @@ function App() {
             {useStore.getState().passages}
 
             <Player shoot={shoot} />
-            <MemoEnemy />
+            {/* <MemoEnemy x={10} z={10} /> */}
+            {/* <MemoEnemy x={10} z={10} /> */}
+            {/* <MemoEnemy x={10} z={10} /> */}
+            <MemoEnemy x={0} z={0} />
           </Physics>
         </Canvas>
       </Suspense>

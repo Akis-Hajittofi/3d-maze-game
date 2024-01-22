@@ -82,7 +82,7 @@ const Player = ({ shoot }) => {
         gravityScale={8}
         linearDamping={14}
         userData={"player"}
-        position={[10, 0, 10]}
+        position={[-10, 0, -10]}
       >
         <mesh rotation={[0, 0, 0]} position={[0, 0, 0]}>
           <capsuleGeometry args={[0.5, 1.5]} />
