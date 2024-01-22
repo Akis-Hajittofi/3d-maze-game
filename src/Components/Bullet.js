@@ -4,7 +4,7 @@ import React, { useRef } from "react";
 import { Euler, MeshBasicMaterial, Vector3 } from "three";
 
 const bulletMaterial = new MeshBasicMaterial({
-  color: "hotpink",
+  color: "#1F51FF",
   toneMapped: false,
 });
 
@@ -52,7 +52,7 @@ function Bullet({ bulletInfo, onHit }) {
         material={bulletMaterial}
         castShadow
       >
-        <pointLight color={"white"} intensity={10} distance={8} decay={1} />
+        <pointLight color={"#1F51FF"} intensity={10} distance={8} decay={1} />
         <boxGeometry args={[0.1, 0.1, 1.5]} />
       </mesh>
     </RigidBody>

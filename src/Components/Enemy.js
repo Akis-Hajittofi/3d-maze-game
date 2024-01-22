@@ -30,7 +30,7 @@ function Enemy({ x = 0, z = 0, size = [5, 5] }) {
   const enemyRef = useRef();
   const playerRef = useRef();
 
-  let enemyMoveTo = useMemo(() => new Vector3(x, 0, z), []);
+  let enemyMoveTo = useMemo(() => new Vector3(x, 1.25, z), []);
   let generateRandomPosition = useCallback(
     () => randomPosition(size, x, z),
     []
