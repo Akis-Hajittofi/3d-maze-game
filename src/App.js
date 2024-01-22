@@ -1,12 +1,13 @@
 import { KeyboardControls, PointerLockControls, Sky } from "@react-three/drei";
 import "./App.css";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Suspense, useEffect, useState, useRef } from "react";
+import React, { Suspense, useEffect, useState, useRef, useMemo } from "react";
 import {
   CapsuleCollider,
   CuboidCollider,
   Physics,
   RigidBody,
+  vec3,
 } from "@react-three/rapier";
 import Player from "./Components/Player";
 import Coin from "./Components/Coin";
@@ -15,6 +16,8 @@ import Ground from "./Components/Ground";
 import Room from "./Components/Room";
 import Passage from "./Components/Passages";
 import useStore from "./store";
+import { Vector3 } from "three";
+import Enemy from "./Components/Enemy";
 
 function Coins() {
   const [coins, setCoins] = useState([]);
@@ -40,49 +43,6 @@ function Bullets({ bullets, setBullets }) {
   };
 
   return bullets.map((b) => <Bullet bulletInfo={b} onHit={onHit} />);
-}
-
-function Enemy(props) {
-  const refE = useRef();
-  const refR = useRef();
-  useFrame(() => {
-    if (refE?.current) {
-      console.log(refE.current.translation(), refR.current.rawSet);
-    }
-  });
-  return (
-    <>
-      <RigidBody
-        ref={refE}
-        type="dynamic"
-        colliders={false}
-        mass={70}
-        lockRotations
-        linearDamping={3}
-        name="enemy"
-      >
-        {/* <mesh position={[1, 3, 1]}>
-        <boxGeometry args={[1, 1, 1]} />
-
-        <meshStandardMaterial color={"orange"} />
-      </mesh> */}
-
-        <mesh rotation={[0, 0, 0]} position={[8, 3, 1]}>
-          <capsuleGeometry args={[0.5, 1.5]} />
-          <meshStandardMaterial color={"white"} />
-        </mesh>
-        <CapsuleCollider args={[0.75, 0.5]} position={[8, 3, 1]} />
-      </RigidBody>
-      <RigidBody type="fixed" name="sensor" ref={refR}>
-        <CuboidCollider
-          position={[8, 2, 1]}
-          args={[5, 1.5, 5]}
-          sensor
-          onIntersectionEnter={() => console.log("Goal!")}
-        />
-      </RigidBody>
-    </>
-  );
 }
 
 function App() {
@@ -127,7 +87,7 @@ function App() {
           <Physics gravity={[0, -9.81, 0]} debug>
             <Sky sunPosition={[100, 20, 100]} />
             <Ground />
-            <Coins />
+            <MemoCoin />
             {/* <Room x={50} z={50} size={[60, 50]} /> */}
             <Bullets bullets={bullets} setBullets={setBullets} />
             <RigidBody type="fixed" colliders={"cuboid"}>
@@ -151,12 +111,13 @@ function App() {
             {useStore.getState().passages}
 
             <Player shoot={shoot} />
-            <Enemy />
+            <MemoEnemy />
           </Physics>
         </Canvas>
       </Suspense>
     </KeyboardControls>
   );
 }
-
+let MemoEnemy = React.memo(Enemy);
+let MemoCoin = React.memo(Coins);
 export default App;
