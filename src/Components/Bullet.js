@@ -1,6 +1,6 @@
 import { useFrame } from "@react-three/fiber";
 import { RigidBody } from "@react-three/rapier";
-import React, { useRef } from "react";
+import React, { useCallback, useMemo, useRef } from "react";
 import { Euler, MeshBasicMaterial, Vector3 } from "three";
 
 const bulletMaterial = new MeshBasicMaterial({
@@ -10,12 +10,37 @@ const bulletMaterial = new MeshBasicMaterial({
 
 bulletMaterial.color.multiplyScalar(42);
 
-function Bullet({ bulletInfo, onHit }) {
-  let p = new Vector3(0.5, 1, -1)
+const calculateBulletPosition = (bulletInfo) => {
+  return new Vector3(0.5, 1, -1)
     .applyQuaternion(bulletInfo.playerQuat)
     .add(bulletInfo.playerPos);
-  let r = new Euler().setFromQuaternion(bulletInfo.playerQuat);
+};
+
+const calculateBulletRotation = (bulletInfo) => {
+  return new Euler().setFromQuaternion(bulletInfo.playerQuat);
+};
+
+function Bullet({ bulletInfo, onHit }) {
   const ref = useRef();
+
+  const bulletPosition = useMemo(
+    () => calculateBulletPosition(bulletInfo),
+    [bulletInfo]
+  );
+  const bulletRotation = useMemo(
+    () => calculateBulletRotation(bulletInfo),
+    [bulletInfo]
+  );
+
+  let handelIntersection = useCallback(({ other }) => {
+    if (
+      other.rigidBodyObject.name !== "player" &&
+      other.rigidBodyObject.name !== "sensor"
+    ) {
+      const { name, userData } = other.rigidBodyObject;
+      onHit({ id: bulletInfo.id, name, userData });
+    }
+  }, []);
 
   useFrame(() => {
     if (ref?.current) {
@@ -33,19 +58,11 @@ function Bullet({ bulletInfo, onHit }) {
       name="bullet"
       gravityScale={0}
       sensor
-      onIntersectionEnter={({ other }) => {
-        if (
-          other.rigidBodyObject.name !== "player" &&
-          other.rigidBodyObject.name !== "sensor"
-        ) {
-          const { name, userData } = other.rigidBodyObject;
-          onHit({ id: bulletInfo.id, name, userData });
-        }
-      }}
+      onIntersectionEnter={handelIntersection}
     >
       <mesh
-        position={[p.x, p.y, p.z]}
-        rotation={[r.x, r.y, r.z]}
+        position={bulletPosition}
+        rotation={bulletRotation}
         material={bulletMaterial}
         castShadow
       >

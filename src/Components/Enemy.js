@@ -19,16 +19,11 @@ import { Vector3 } from "three";
 import useStore from "../store";
 
 let randomPosition = ([sX, sZ], x, z) => {
+  let randomSign = Math.floor(Math.round(Math.random()) * 2 - 1);
   return new Vector3(
-    +(
-      Math.floor(Math.round(Math.random()) * 2 - 1) * Math.random() * sX +
-      x
-    ).toFixed(3),
+    +(randomSign * Math.random() * sX + x).toFixed(3),
     0,
-    +(
-      Math.floor(Math.round(Math.random()) * 2 - 1) * Math.random() * sZ +
-      z
-    ).toFixed(3)
+    +(randomSign * Math.random() * sZ + z).toFixed(3)
   );
 };
 
@@ -52,8 +47,7 @@ const Enemy = ({ x = 0, z = 0, size = [5, 5], id, color = "white" }) => {
   );
 
   const moveEnemyToward = useCallback(
-    (targetPosition) => {
-      const speed = 0.01;
+    (targetPosition, speed = 0.01) => {
       enemyInitPosition.x +=
         speed * Math.sign(targetPosition.x - enemyInitPosition.x);
       enemyInitPosition.z +=
@@ -78,7 +72,7 @@ const Enemy = ({ x = 0, z = 0, size = [5, 5], id, color = "white" }) => {
         if (playerRef?.current) {
           isDistanceLessThan(playerRef.current.position, 0.95)
             ? onHit()
-            : moveEnemyToward(playerRef.current.position);
+            : moveEnemyToward(playerRef.current.position, 0.02);
         } else {
           isDistanceLessThan(enemyPosition, 1.5)
             ? (enemyPosition = generateRandomPosition())

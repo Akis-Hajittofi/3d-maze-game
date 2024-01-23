@@ -28,13 +28,26 @@ const useStore = create((set, get) => ({
   die: "",
 
   enemies: [
-    <Enemy x={roomsConfig[0].x} z={roomsConfig[0].z} id={"e1"} color="black" />,
-    <Enemy x={roomsConfig[0].x + 10} z={roomsConfig[0].z + 10} id={"e2"} />,
     <Enemy
       x={roomsConfig[0].x + 10}
-      z={roomsConfig[0].z - 10}
-      id={"e3"}
+      z={roomsConfig[0].z + 10}
+      id={"e1"}
+      size={[10, 10]}
       color="red"
+    />,
+    <Enemy
+      x={roomsConfig[0].x + 0}
+      z={roomsConfig[0].z + 10}
+      id={"e2"}
+      size={[10, 10]}
+      color="red"
+    />,
+    <Enemy
+      x={roomsConfig[0].x}
+      z={roomsConfig[0].z}
+      id={"e3"}
+      color="green"
+      size={roomsConfig[0].size.map((s) => s / 2)}
     />,
   ],
 
