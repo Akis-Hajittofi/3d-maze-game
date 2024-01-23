@@ -3,10 +3,19 @@ import {
   CapsuleCollider,
   CuboidCollider,
   RigidBody,
+  quat,
   vec3,
 } from "@react-three/rapier";
-import React, { useCallback, useMemo, useRef } from "react";
+import React, {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+} from "react";
 import { Vector3 } from "three";
+import useStore from "../store";
 
 let randomPosition = ([sX, sZ], x, z) => {
   return new Vector3(
@@ -26,11 +35,14 @@ const onHit = () => {
   console.log("hit - reduce health ");
 };
 
-function Enemy({ x = 0, z = 0, size = [5, 5] }) {
+const Enemy = ({ x = 0, z = 0, size = [5, 5], id, color = "white" }) => {
+  console.log("enemey", x, z, id, color);
+  let die = useStore((state) => state.die);
   const enemyRef = useRef();
   const playerRef = useRef();
 
   let enemyMoveTo = useMemo(() => new Vector3(x, 1.25, z), []);
+  // let enemyMoveTo = new Vector3(x, 1.25, z);
   let generateRandomPosition = useCallback(
     () => randomPosition(size, x, z),
     []
@@ -47,7 +59,7 @@ function Enemy({ x = 0, z = 0, size = [5, 5] }) {
 
   let enemyGoTo = generateRandomPosition();
   useFrame(() => {
-    if (enemyRef?.current) {
+    if (enemyRef?.current && !(die === id)) {
       let isDistanceLessThan = (to, lessThan) =>
         vec3(enemyRef.current.translation()).distanceTo(to) <= lessThan;
 
@@ -62,6 +74,16 @@ function Enemy({ x = 0, z = 0, size = [5, 5] }) {
       }
     }
   });
+
+  useEffect(() => {
+    if (die === id) {
+      console.log(die, id, "from enemy", die === id, enemyRef);
+      console.log();
+      // enemyRef.current.lockRotation = false;
+      // let p = vec3(enemyRef.current.translation());
+      // enemyRef.current.setTranslation(new Vector3(p.x, -1.75, p.z), true);
+    }
+  }, [die]);
   return (
     <>
       <RigidBody
@@ -69,14 +91,15 @@ function Enemy({ x = 0, z = 0, size = [5, 5] }) {
         type="dynamic"
         colliders={false}
         mass={70}
-        lockRotations
+        lockRotations={true}
         linearDamping={3}
         name="enemy"
         position={[x, 1.25, z]}
+        userData={{ id }}
       >
         <mesh rotation={[0, 0, 0]}>
           <capsuleGeometry args={[0.5, 1.5]} />
-          <meshStandardMaterial color={"white"} />
+          <meshStandardMaterial color={color} />
         </mesh>
         <CapsuleCollider args={[0.75, 0.5]} />
       </RigidBody>
@@ -99,5 +122,6 @@ function Enemy({ x = 0, z = 0, size = [5, 5] }) {
       </RigidBody>
     </>
   );
-}
-export default Enemy;
+};
+
+export default React.memo(Enemy);

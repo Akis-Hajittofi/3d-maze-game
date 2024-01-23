@@ -102,4 +102,4 @@ const Passage = ({ room1, room2 }) => {
 //   );
 // };
 
-export default Passage;
+export default React.memo(Passage);

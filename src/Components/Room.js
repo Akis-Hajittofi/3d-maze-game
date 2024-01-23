@@ -74,4 +74,4 @@ function Room({ x, z, size, doors = [0, 0, 0, 0], color }) {
   );
 }
 
-export default Room;
+export default React.memo(Room);

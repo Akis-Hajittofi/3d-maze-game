@@ -35,10 +35,15 @@ function Coins() {
 }
 
 function Bullets({ bullets, setBullets }) {
-  const onHit = (bulletID) => {
+  let removeEnemy = useStore((state) => state.removeEnemy);
+  const onHit = ({ id: bulletId, name, userData }) => {
+    // check if hit enemy
+    if (name === "enemy") {
+      removeEnemy(userData.id);
+    }
     // then remove the bullet
     setBullets((bullets) => [
-      ...bullets.filter(({ id }) => id !== bulletID), //10 is the fire-rate
+      ...bullets.filter(({ id }) => id !== bulletId), //10 is the fire-rate
     ]);
   };
 
@@ -49,6 +54,7 @@ function App() {
   // bullet would be created by the bullet
   const [bullets, setBullets] = useState([]);
 
+  let enemies = useStore((state) => state.enemies);
   // this will be implement by the player
   const shoot = (bullet) => {
     setBullets((bullets) => [...bullets, bullet]);
@@ -57,7 +63,6 @@ function App() {
     }
   };
 
-  console.log(useStore.getState().passages);
   return (
     <KeyboardControls
       map={[
@@ -109,18 +114,17 @@ function App() {
 
             {useStore.getState().rooms}
             {useStore.getState().passages}
-
+            {/* {useStore.getState().enemies} */}
+            {enemies}
             <Player shoot={shoot} />
             {/* <MemoEnemy x={10} z={10} /> */}
             {/* <MemoEnemy x={10} z={10} /> */}
             {/* <MemoEnemy x={10} z={10} /> */}
-            <MemoEnemy x={0} z={0} />
           </Physics>
         </Canvas>
       </Suspense>
     </KeyboardControls>
   );
 }
-let MemoEnemy = React.memo(Enemy);
 let MemoCoin = React.memo(Coins);
 export default App;

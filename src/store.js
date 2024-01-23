@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import Passage from "./Components/Passages";
 import Room from "./Components/Room";
+import Enemy from "./Components/Enemy";
+import { useEffect, useRef } from "react";
 
 let c = "#1a273a";
 
@@ -12,7 +14,7 @@ let roomsConfig = [
   { name: "room5", x: 0, z: -200, size: [70, 70], color: c },
 ];
 
-const useStore = create((set) => ({
+const useStore = create((set, get) => ({
   rooms: roomsConfig.map((r) => (
     <Room x={r.x} z={r.z} size={r.size} key={r.name} color={r.color} />
   )),
@@ -22,6 +24,33 @@ const useStore = create((set) => ({
     <Passage room1={roomsConfig[0]} room2={roomsConfig[3]} />,
     <Passage room1={roomsConfig[0]} room2={roomsConfig[4]} />,
   ],
+
+  die: "",
+  enemies: [
+    <Enemy x={roomsConfig[0].x} z={roomsConfig[0].z} id={"e1"} color="black" />,
+    <Enemy x={roomsConfig[0].x + 10} z={roomsConfig[0].z + 10} id={"e2"} />,
+    <Enemy
+      x={roomsConfig[0].x + 10}
+      z={roomsConfig[0].z - 10}
+      id={"e3"}
+      color="red"
+    />,
+  ],
+  removeEnemy: (id) => {
+    get().enemies.forEach((Component) => {
+      if (Component.props.id === id) {
+        set({ die: id });
+      }
+    });
+    let filterE = get().enemies.filter((component) => {
+      return component.props.id != id;
+    });
+    setTimeout(() => {
+      set({
+        enemies: filterE,
+      });
+    }, 100);
+  },
 }));
 
 export default useStore;

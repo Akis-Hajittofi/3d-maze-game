@@ -4,14 +4,13 @@ import React, { useRef } from "react";
 import { Euler, MeshBasicMaterial, Vector3 } from "three";
 
 const bulletMaterial = new MeshBasicMaterial({
-  color: "#1F51FF",
+  color: "red",
   toneMapped: false,
 });
 
 bulletMaterial.color.multiplyScalar(42);
 
 function Bullet({ bulletInfo, onHit }) {
-  // console.log(bulletInfo);
   let p = new Vector3(0.5, 1, -1)
     .applyQuaternion(bulletInfo.playerQuat)
     .add(bulletInfo.playerPos);
@@ -25,7 +24,6 @@ function Bullet({ bulletInfo, onHit }) {
       );
       forward.multiplyScalar(0.05); //speed
       ref.current.applyImpulse(forward, true);
-      // ref.current.addForce(forward, true);
     }
   });
 
@@ -40,9 +38,8 @@ function Bullet({ bulletInfo, onHit }) {
           other.rigidBodyObject.name !== "player" &&
           other.rigidBodyObject.name !== "sensor"
         ) {
-          console.log(other.rigidBodyObject);
-          // will remove the bullet
-          onHit(bulletInfo.id);
+          const { name, userData } = other.rigidBodyObject;
+          onHit({ id: bulletInfo.id, name, userData });
         }
       }}
     >
@@ -52,11 +49,11 @@ function Bullet({ bulletInfo, onHit }) {
         material={bulletMaterial}
         castShadow
       >
-        <pointLight color={"#1F51FF"} intensity={10} distance={8} decay={1} />
+        <pointLight color={"red"} intensity={10} distance={8} decay={1} />
         <boxGeometry args={[0.1, 0.1, 1.5]} />
       </mesh>
     </RigidBody>
   );
 }
 
-export default Bullet;
+export default React.memo(Bullet);
