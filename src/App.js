@@ -54,7 +54,7 @@ function App() {
   // bullet would be created by the bullet
   const [bullets, setBullets] = useState([]);
 
-  let enemies = useStore((state) => state.enemies);
+  // let enemies = useStore((state) => state.enemies);
   // this will be implement by the player
   const shoot = (bullet) => {
     setBullets((bullets) => [...bullets, bullet]);
@@ -62,7 +62,6 @@ function App() {
       setBullets([]);
     }
   };
-
   return (
     <KeyboardControls
       map={[
@@ -114,12 +113,9 @@ function App() {
 
             {useStore.getState().rooms}
             {useStore.getState().passages}
-            {/* {useStore.getState().enemies} */}
-            {enemies}
+            {useStore.getState().enemies.map((e) => e)}
+            {/* {enemies.map((e) => e)} */}
             <Player shoot={shoot} />
-            {/* <MemoEnemy x={10} z={10} /> */}
-            {/* <MemoEnemy x={10} z={10} /> */}
-            {/* <MemoEnemy x={10} z={10} /> */}
           </Physics>
         </Canvas>
       </Suspense>

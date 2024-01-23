@@ -26,6 +26,7 @@ const useStore = create((set, get) => ({
   ],
 
   die: "",
+
   enemies: [
     <Enemy x={roomsConfig[0].x} z={roomsConfig[0].z} id={"e1"} color="black" />,
     <Enemy x={roomsConfig[0].x + 10} z={roomsConfig[0].z + 10} id={"e2"} />,
@@ -36,20 +37,11 @@ const useStore = create((set, get) => ({
       color="red"
     />,
   ],
+
   removeEnemy: (id) => {
-    get().enemies.forEach((Component) => {
-      if (Component.props.id === id) {
-        set({ die: id });
-      }
+    set({
+      die: id,
     });
-    let filterE = get().enemies.filter((component) => {
-      return component.props.id != id;
-    });
-    setTimeout(() => {
-      set({
-        enemies: filterE,
-      });
-    }, 100);
   },
 }));
 
