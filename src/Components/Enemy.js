@@ -32,7 +32,8 @@ const onHit = () => {
 };
 
 const Enemy = ({ x = 0, z = 0, size = [5, 5], id, color = "white" }) => {
-  let die = useStore((state) => state.die);
+  let enemyDiedID = useStore((state) => state.enemyDiedID);
+
   let [isDead, setIsDead] = useState(false);
   let [animateDeath, setAnimateDeath] = useState(false);
 
@@ -83,13 +84,15 @@ const Enemy = ({ x = 0, z = 0, size = [5, 5], id, color = "white" }) => {
   });
 
   useEffect(() => {
-    if (die === id) {
+    if (enemyDiedID === id) {
+
       setAnimateDeath(true);
       setTimeout(() => {
         setIsDead(true);
       }, 1000);
     }
-  }, [die]);
+  }, [enemyDiedID]);
+
 
   return (
     <>

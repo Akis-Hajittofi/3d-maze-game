@@ -5,7 +5,7 @@ function PassageComponent({
   position,
   rotation,
   offset = 0,
-  color = "white",
+  color,
   l = 70,
   depth,
 }) {
@@ -18,22 +18,29 @@ function PassageComponent({
         width={width}
         height={15}
         depth={depth}
-        color={"orange"}
-      />
+        color={color}
 
+      />
       <Wall
         position={[0 + offset, 3, 4]}
         width={width}
         height={15}
         depth={depth}
-        color={"orange"}
+        color={color}
+      />
+      <Wall
+        position={[0 + offset, 11.5, 0]}
+        width={width}
+        height={2}
+        depth={11}
+        color={color}
       />
     </group>
   );
 }
 
 // A function that renders the passage based on the position from room1 to room2
-const Passage = ({ room1, room2 }) => {
+const Passage = ({ room1, room2, color = "red" }) => {
   // const room1 = { x: 0, z: 0, size: [80, 80] };
   // const room2 = { x: 200, z: 0, size: [30, 30] };
   const depth = 3;
@@ -80,6 +87,7 @@ const Passage = ({ room1, room2 }) => {
       offset={(length + roomSize + depth) / 2}
       depth={depth}
       rotation={rotation}
+      color={color}
     />
   );
 };

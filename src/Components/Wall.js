@@ -1,7 +1,7 @@
 import React from "react";
 import { RigidBody } from "@react-three/rapier";
 
-function Wall({ position, width = 5, height, depth, color = "#0F172A" }) {
+function Wall({ position, width = 5, height, depth, color }) {
   return (
     <RigidBody type="fixed" colliders={"cuboid"}>
       <mesh position={position}>
