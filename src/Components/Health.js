@@ -4,8 +4,8 @@ import { RigidBody } from "@react-three/rapier";
 import useStore from "../store";
 import { Html } from "@react-three/drei";
 
-const Coin = ({ x, z, id }) => {
-  let removeCoin = useStore((state) => state.removeCoin);
+const Health = ({ x, z, id }) => {
+  let increaseHealth = useStore((state) => state.increaseHealth);
   const ref = useRef();
   let collided = false;
   useFrame((state) => {
@@ -30,10 +30,10 @@ const Coin = ({ x, z, id }) => {
         sprite // Renders as sprite, but only in transform mode (default=false)
         position={[x, 2, z]}
       >
-        <h1 className="text-yellow-500">Coin</h1>
+        <h1 className="text-green-500">Health</h1>
       </Html>
       <RigidBody
-        name="coin"
+        name="health"
         ref={ref}
         type="fixed"
         colliders={"trimesh"}
@@ -45,28 +45,33 @@ const Coin = ({ x, z, id }) => {
           ) {
             collided = true;
             setTimeout(() => {
-              removeCoin(id);
+              increaseHealth(id);
             }, 20); // creates a bumping effect
           }
         }}
         position={[x, 0, z]}
       >
-        <mesh rotation={[Math.PI / 2, 0, 0]}>
-          <pointLight
-            intensity={1}
-            distance={5}
-            decay={1.5}
-            color={"#F4BF50"}
-          />
-          <cylinderGeometry args={[0.2, 0.2, 0.1]} />
-          <meshStandardMaterial
-            color={"#F4BF50"}
-            roughness={0.4}
-            metalness={0.1}
-          />
-        </mesh>
+        {/* <pointLight intensity={1} distance={5} decay={1.5} color={"#39ff14"} /> */}
+        <group>
+          <mesh rotation={[Math.PI / 2, 0, 0]}>
+            <boxGeometry args={[0.2, 0.2, 0.4]} />
+            <meshStandardMaterial
+              color={"#39ff14"}
+              roughness={0.4}
+              metalness={0.1}
+            />
+          </mesh>
+          <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, -0.2, 0]}>
+            <boxGeometry args={[0.5, 0.5, 0.5]} />
+            <meshStandardMaterial
+              color={"#39ff14"}
+              roughness={0.4}
+              metalness={0.1}
+            />
+          </mesh>
+        </group>
       </RigidBody>
     </>
   );
 };
-export default React.memo(Coin);
+export default React.memo(Health);

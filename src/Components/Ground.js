@@ -20,4 +20,4 @@ function Ground(props) {
   );
 }
 
-export default Ground;
+export default React.memo(Ground);

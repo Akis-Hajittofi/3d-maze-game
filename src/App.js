@@ -1,37 +1,21 @@
-import { KeyboardControls, PointerLockControls, Sky } from "@react-three/drei";
+import { KeyboardControls, Sky } from "@react-three/drei";
 import "./App.css";
-import { Canvas, useFrame } from "@react-three/fiber";
-import React, { Suspense, useEffect, useState, useRef, useMemo } from "react";
-import {
-  CapsuleCollider,
-  CuboidCollider,
-  Physics,
-  RigidBody,
-  vec3,
-} from "@react-three/rapier";
+import { Canvas } from "@react-three/fiber";
+import React, { Suspense, useState } from "react";
+import { Physics, RigidBody } from "@react-three/rapier";
 import Player from "./Components/Player";
-import Coin from "./Components/Coin";
 import Bullet from "./Components/Bullet";
 import Ground from "./Components/Ground";
-import Room from "./Components/Room";
-import Passage from "./Components/Passages";
 import useStore from "./store";
-import { Vector3 } from "three";
-import Enemy from "./Components/Enemy";
+
+// function HealthItem() {
+//   let healthItem = useStore((state) => state.healthItem);
+//   return healthItem.map((h) => h);
+// }
 
 function Coins() {
-  const [coins, setCoins] = useState([]);
-  useEffect(() => {
-    setCoins([
-      <Coin setCoins={setCoins} x={1} z={1} key={0} id={0} />,
-      <Coin setCoins={setCoins} x={1} z={2} key={1} id={1} />,
-      <Coin setCoins={setCoins} x={1} z={3} key={2} id={2} />,
-      <Coin setCoins={setCoins} x={1} z={-1} key={3} id={3} />,
-      <Coin setCoins={setCoins} x={1} z={-2} key={4} id={4} />,
-      <Coin setCoins={setCoins} x={1} z={-3} key={5} id={5} />,
-    ]);
-  }, []);
-  return coins.map((coin) => coin);
+  let coins = useStore((state) => state.coins);
+  return coins.map((c) => c);
 }
 
 function Bullets({ bullets, setBullets }) {
@@ -50,12 +34,53 @@ function Bullets({ bullets, setBullets }) {
   return bullets.map((b) => <Bullet bulletInfo={b} onHit={onHit} />);
 }
 
+let Overlay = () => {
+  let { health, gameState, retry, enemiesKilled, points } = useStore(
+    (state) => state
+  );
+  return (
+    <>
+      <div className="absolute top-0 right-0 h-full p-4">
+        <div className=" relative z-10  flex  items-center  ">
+          {gameState !== "play" && (
+            <div
+              className=" text-white p-1 ml-2 border rounded-lg cursor-pointer"
+              onClick={retry}
+            >
+              retry
+            </div>
+          )}
+
+          <div className=" text-white p-2"> health: </div>
+          <div
+            className="  h-6 border-2 border-white rounded-md"
+            style={{ width: 102 }}
+          >
+            <div
+              className={`h-5 bg-white rounded-sm`}
+              style={{ width: health }}
+            >
+              {/* <span className="font-bold italic text-red-600"> {health} </span> */}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="absolute top-0 left-0 h-full p-4">
+        <div className=" relative z-10  flex  items-center  ">
+          <div className=" text-white "> Points: {points} </div>
+          <div className=" text-white p-2"> | </div>
+          <div className=" text-white "> Enemy Killed: {enemiesKilled} </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
 function App() {
-  // bullet would be created by the bullet
+  let gameState = useStore((state) => state.gameState);
+  let healthItem = useStore((state) => state.healthItem);
   const [bullets, setBullets] = useState([]);
 
-  // let enemies = useStore((state) => state.enemies);
-  // this will be implement by the player
   const shoot = (bullet) => {
     setBullets((bullets) => [...bullets, bullet]);
     if (bullets.length === 10) {
@@ -63,64 +88,65 @@ function App() {
     }
   };
   return (
-    <KeyboardControls
-      map={[
-        { name: "forward", keys: ["ArrowUp", "w", "W"] },
-        { name: "backward", keys: ["ArrowDown", "s", "S"] },
-        { name: "left", keys: ["ArrowLeft", "a", "A"] },
-        { name: "right", keys: ["ArrowRight", "d", "D"] },
-        { name: "jump", keys: ["Space"] },
-        { name: "shift", keys: ["Shift"] },
-        { name: "q", keys: ["q", "Q"] },
-      ]}
-    >
-      <Suspense>
-        <Canvas
-          shadows
-          camera={{ position: [0, -0.5, 4] }}
-          // onMouseDown={(e) => console.log("1")}
-          // onMouseUp={(e) => console.log("2")}
-          // onMouseLeave={(e) => console.log("3")}
+    <>
+      <Overlay />
+      {gameState === "play" && (
+        <KeyboardControls
+          map={[
+            { name: "forward", keys: ["ArrowUp", "w", "W"] },
+            { name: "backward", keys: ["ArrowDown", "s", "S"] },
+            { name: "left", keys: ["ArrowLeft", "a", "A"] },
+            { name: "right", keys: ["ArrowRight", "d", "D"] },
+            { name: "jump", keys: ["Space"] },
+            { name: "shift", keys: ["Shift"] },
+            { name: "q", keys: ["q", "Q"] },
+          ]}
         >
-          <ambientLight intensity={Math.PI / 10} />
-          <pointLight
-            position={[-10, -10, -10]}
-            decay={0}
-            intensity={Math.PI}
-          />
-          <Physics gravity={[0, -9.81, 0]} debug>
-            <Sky sunPosition={[100, 20, 100]} />
-            <Ground />
-            <MemoCoin />
-            {/* <Room x={50} z={50} size={[60, 50]} /> */}
-            <Bullets bullets={bullets} setBullets={setBullets} />
-            <RigidBody type="fixed" colliders={"cuboid"}>
-              <mesh
-                receiveShadow
-                position={[10, 5, 10]}
-                rotation-x={Math.PI / 2}
-              >
-                <pointLight
-                  color={"white"}
-                  intensity={10}
-                  distance={8}
-                  decay={1}
-                />
-                <boxGeometry args={[5, 5, 0.1]} />
-                <meshStandardMaterial color="#fff" />
-              </mesh>
-            </RigidBody>
-
-            {useStore.getState().rooms}
-            {useStore.getState().passages}
-            {useStore.getState().enemies.map((e) => e)}
-            {/* {enemies.map((e) => e)} */}
-            <Player shoot={shoot} />
-          </Physics>
-        </Canvas>
-      </Suspense>
-    </KeyboardControls>
+          <Suspense>
+            <Canvas shadows camera={{ position: [0, -0.5, 4] }}>
+              <ambientLight intensity={Math.PI / 10} />
+              <pointLight
+                position={[-10, -10, -10]}
+                decay={0}
+                intensity={Math.PI}
+              />
+              <Physics gravity={[0, -9.81, 0]} debug>
+                <Sky sunPosition={[100, 20, 100]} />
+                <Ground />
+                <MemoCoins />
+                {healthItem.map((e) => e)}
+                {/* <HealthItem /> */}
+                {/* <Room x={50} z={50} size={[60, 50]} /> */}
+                <MemoBullet bullets={bullets} setBullets={setBullets} />
+                <RigidBody type="fixed" colliders={"cuboid"}>
+                  <mesh
+                    receiveShadow
+                    position={[10, 5, 10]}
+                    rotation-x={Math.PI / 2}
+                  >
+                    <pointLight
+                      color={"white"}
+                      intensity={10}
+                      distance={8}
+                      decay={1}
+                    />
+                    <boxGeometry args={[5, 5, 0.1]} />
+                    <meshStandardMaterial color="#fff" />
+                  </mesh>
+                </RigidBody>
+                {useStore.getState().healthItem}
+                {useStore.getState().rooms}
+                {useStore.getState().passages}
+                {useStore.getState().enemies.map((e) => e)}
+                <Player shoot={shoot} />
+              </Physics>
+            </Canvas>
+          </Suspense>
+        </KeyboardControls>
+      )}
+    </>
   );
 }
-let MemoCoin = React.memo(Coins);
+const MemoCoins = React.memo(Coins);
+const MemoBullet = React.memo(Bullets);
 export default App;

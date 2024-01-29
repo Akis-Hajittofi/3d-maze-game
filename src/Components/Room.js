@@ -89,7 +89,7 @@ function Room({ x, z, size, doors = [1, 1, 1, 1], color }) {
           width={xLength}
           height={15}
         />
-      )}{" "}
+      )}
       {doors[3] ? (
         <WallWithDoor
           position={[x - xLength / 2, 3, z]}

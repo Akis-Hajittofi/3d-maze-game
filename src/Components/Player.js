@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef } from "react";
 import { PointerLockControls, useKeyboardControls } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { CapsuleCollider, RigidBody, quat, vec3 } from "@react-three/rapier";
@@ -45,6 +45,9 @@ const Player = ({ shoot }) => {
   const player = useRef();
   const [, get] = useKeyboardControls();
   const lastShoot = useRef(0);
+  const pointerLockRef = useRef(null);
+  // const unlock = useRef();
+
   lastShoot.current = Date.now();
 
   useFrame((state) => {
@@ -58,9 +61,11 @@ const Player = ({ shoot }) => {
   return (
     <>
       <PointerLockControls
+        ref={pointerLockRef}
         onLock={(e) => {
           let playerPos = vec3(player.current.translation());
           let playerQuat = quat(player.current.rotation());
+          console.log(playerPos);
           if (Date.now() - lastShoot.current > 75) {
             lastShoot.current = Date.now();
             let bullet = {

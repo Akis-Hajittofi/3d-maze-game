@@ -3,14 +3,11 @@ import {
   CapsuleCollider,
   CuboidCollider,
   RigidBody,
-  quat,
   vec3,
 } from "@react-three/rapier";
 import React, {
-  forwardRef,
   useCallback,
   useEffect,
-  useImperativeHandle,
   useMemo,
   useRef,
   useState,
@@ -27,11 +24,10 @@ let randomPosition = ([sX, sZ], x, z) => {
   );
 };
 
-const onHit = () => {
-  console.log("hit - reduce health ");
-};
-
 const Enemy = ({ x = 0, z = 0, size = [5, 5], id, color = "white" }) => {
+  let reduceHealth = useStore((state) => state.reduceHealth);
+  let addCoin = useStore((state) => state.addCoin);
+  let addHealthItem = useStore((state) => state.addHealthItem);
   let enemyDiedID = useStore((state) => state.enemyDiedID);
 
   let [isDead, setIsDead] = useState(false);
@@ -40,11 +36,11 @@ const Enemy = ({ x = 0, z = 0, size = [5, 5], id, color = "white" }) => {
   const enemyRef = useRef();
   const playerRef = useRef();
 
-  let enemyInitPosition = useMemo(() => new Vector3(x, 1.25, z), [id]);
+  let enemyInitPosition = useMemo(() => new Vector3(x, 1.25, z), [z, x]);
 
   let generateRandomPosition = useCallback(
     () => randomPosition(size, x, z),
-    [id]
+    [x, z, size]
   );
 
   const moveEnemyToward = useCallback(
@@ -58,7 +54,7 @@ const Enemy = ({ x = 0, z = 0, size = [5, 5], id, color = "white" }) => {
         true
       );
     },
-    [id]
+    [enemyInitPosition]
   );
 
   let enemyPosition = generateRandomPosition();
@@ -72,7 +68,7 @@ const Enemy = ({ x = 0, z = 0, size = [5, 5], id, color = "white" }) => {
 
         if (playerRef?.current) {
           isDistanceLessThan(playerRef.current.position, 0.95)
-            ? onHit()
+            ? reduceHealth()
             : moveEnemyToward(playerRef.current.position, 0.02);
         } else {
           isDistanceLessThan(enemyPosition, 1.5)
@@ -85,14 +81,19 @@ const Enemy = ({ x = 0, z = 0, size = [5, 5], id, color = "white" }) => {
 
   useEffect(() => {
     if (enemyDiedID === id) {
-
       setAnimateDeath(true);
       setTimeout(() => {
+        console.log(color, color === "green");
+        if (color === "green") {
+          addHealthItem(enemyRef.current.translation());
+        } else {
+          addCoin(enemyRef.current.translation());
+        }
+
         setIsDead(true);
       }, 1000);
     }
-  }, [enemyDiedID]);
-
+  }, [enemyDiedID, addCoin, addHealthItem, color, id]);
 
   return (
     <>
