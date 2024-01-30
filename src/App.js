@@ -7,6 +7,7 @@ import Player from "./Components/Player";
 import Bullet from "./Components/Bullet";
 import Ground from "./Components/Ground";
 import useStore from "./store";
+import Exit from "./Components/Exit";
 
 // function HealthItem() {
 //   let healthItem = useStore((state) => state.healthItem);
@@ -139,6 +140,7 @@ function App() {
                 {useStore.getState().passages}
                 {useStore.getState().enemies.map((e) => e)}
                 <Player shoot={shoot} />
+                <Exit x={0} z={0} />
               </Physics>
             </Canvas>
           </Suspense>

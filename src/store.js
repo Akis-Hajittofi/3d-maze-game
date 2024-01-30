@@ -12,7 +12,7 @@ let roomsConfig = [
   { name: "room0", x: 0, z: 0, size: [50, 50], color: c, doors: [1, 1, 1, 1] }, //
   { name: "room1", x: 0, z: 50, size: [30, 30], color: c, doors: [1, 0, 0, 0] },
   {
-    name: "end-room2",
+    name: "end",
     x: -90,
     z: -70,
     size: [50, 50],
@@ -184,6 +184,7 @@ const useStore = create((set, get) => ({
   points: 0,
   rooms: roomsConfig.map((r) => (
     <Room
+      name={r.name}
       x={r.x}
       z={r.z}
       size={r.size}
@@ -235,7 +236,7 @@ const useStore = create((set, get) => ({
     });
   },
 
-  healthItem: [<Health x={0} z={0} id={1} />],
+  healthItem: [],
 
   increaseHealth: (id) => {
     set((state) => ({
@@ -274,7 +275,11 @@ const useStore = create((set, get) => ({
       });
     }
   },
-
+  end: () => {
+    set({
+      gameState: "end",
+    });
+  },
   retry: () => {
     set({
       gameState: "play",
