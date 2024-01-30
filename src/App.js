@@ -79,7 +79,7 @@ let Overlay = () => {
 
 function App() {
   let gameState = useStore((state) => state.gameState);
-  let healthItem = useStore((state) => state.healthItem);
+  let healthItems = useStore((state) => state.healthItems);
   const [bullets, setBullets] = useState([]);
 
   const shoot = (bullet) => {
@@ -115,7 +115,7 @@ function App() {
                 <Sky sunPosition={[100, 20, 100]} />
                 <Ground />
                 <MemoCoins />
-                {healthItem.map((e) => e)}
+                {healthItems.map((e) => e)}
                 {/* <HealthItem /> */}
                 {/* <Room x={50} z={50} size={[60, 50]} /> */}
                 <MemoBullet bullets={bullets} setBullets={setBullets} />
@@ -135,7 +135,7 @@ function App() {
                     <meshStandardMaterial color="#fff" />
                   </mesh>
                 </RigidBody>
-                {useStore.getState().healthItem}
+                {useStore.getState().healthItems}
                 {useStore.getState().rooms}
                 {useStore.getState().passages}
                 {useStore.getState().enemies.map((e) => e)}
