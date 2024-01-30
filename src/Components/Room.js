@@ -40,10 +40,20 @@ function WallWithDoor({ position, rotation, color, l = 30 }) {
 
 function Room({ x, z, size, doors = [1, 1, 1, 1], color, name }) {
   let [xLength, zLength] = size;
-  console.log(name, x, z);
+  let Roof = (
+    <Wall
+      position={[x, 11.5, z]}
+      width={xLength + 3}
+      depth={zLength + 3}
+      height={2}
+      color={color}
+    />
+  );
   return (
     <group color={color}>
+      <Roof />
       {name === "end" && <Exit z={z} x={x} />}
+      {/* door configuration */}
       {doors[0] ? (
         <WallWithDoor
           position={[x, 3, z - zLength / 2]}
@@ -109,17 +119,11 @@ function Room({ x, z, size, doors = [1, 1, 1, 1], color, name }) {
           height={15}
         />
       )}
-      <mesh receiveShadow position={[x, 0, z]} rotation-x={Math.PI / 2}>
+      {/* <mesh receiveShadow position={[x, 0, z]} rotation-x={Math.PI / 2}>
+      center point of room
         <boxGeometry args={[1, 1, 1]} />
         <meshStandardMaterial color={color} />
-      </mesh>
-      <Wall
-        position={[x, 11.5, z]}
-        width={xLength + 3}
-        depth={zLength + 3}
-        height={2}
-        color={color}
-      />
+      </mesh> */}
     </group>
   );
 }
