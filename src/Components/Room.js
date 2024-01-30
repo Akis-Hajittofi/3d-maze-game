@@ -38,20 +38,22 @@ function WallWithDoor({ position, rotation, color, l = 30 }) {
   );
 }
 
+let Roof = ({ z, x, xLength, zLength, color }) => (
+  <Wall
+    position={[x, 11.5, z]}
+    width={xLength + 3}
+    depth={zLength + 3}
+    height={2}
+    color={color}
+  />
+);
+
 function Room({ x, z, size, doors = [1, 1, 1, 1], color, name }) {
   let [xLength, zLength] = size;
-  let Roof = (
-    <Wall
-      position={[x, 11.5, z]}
-      width={xLength + 3}
-      depth={zLength + 3}
-      height={2}
-      color={color}
-    />
-  );
+
   return (
     <group color={color}>
-      <Roof />
+      <Roof x={x} z={z} xLength={xLength} zLength={zLength} color={color} />
       {name === "end" && <Exit z={z} x={x} />}
       {/* door configuration */}
       {doors[0] ? (
