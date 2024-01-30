@@ -12,11 +12,8 @@ const useStore = create((set, get) => ({
   enemiesKilled: 0,
   enemyDiedID: "",
 
-  // maze component
+  // maze components
   passages: passages,
-  coins: [],
-  enemies: enemies,
-  healthItems: [],
   rooms: roomsConfig.map((r) => (
     <Room
       name={r.name}
@@ -28,6 +25,11 @@ const useStore = create((set, get) => ({
       doors={r.doors}
     />
   )),
+
+  // item components
+  coins: [],
+  healthItems: [],
+  enemies: enemies,
 
   // actions
   addCoin: (coin) => {
