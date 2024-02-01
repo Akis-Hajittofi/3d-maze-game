@@ -1,7 +1,7 @@
 import React from "react";
-import Wall from "./Maze/Wall";
-import Exit from "./Maze/Exit";
-import Door from "./Maze/Door";
+import Wall from "./Wall";
+import Exit from "./Exit";
+import Door from "./Door";
 
 function WallWithDoor({ position, rotation, color, l = 30 }) {
   const depth = 3;

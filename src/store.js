@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import Room from "./Components/Room";
+import Room from "./Components/Maze/Room";
 import Coin from "./Components/Item/Coin";
 import Health from "./Components/Item/Health";
 import { enemies, passages, roomsConfig } from "./utils";
