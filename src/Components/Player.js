@@ -3,6 +3,7 @@ import { PointerLockControls, useKeyboardControls } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { CapsuleCollider, RigidBody, quat, vec3 } from "@react-three/rapier";
 import { Vector3 } from "three";
+import useStore from "../store";
 
 const moveCamera = (player, camera, changeView) => {
   let playerPos = vec3(player.translation());
@@ -41,12 +42,12 @@ const movePlayer = (player, camera, controls) => {
   );
 };
 
-const Player = ({ shoot }) => {
+const Player = () => {
+  let shoot = useStore((state) => state.shoot);
   const player = useRef();
   const [, get] = useKeyboardControls();
   const lastShoot = useRef(0);
   const pointerLockRef = useRef(null);
-  // const unlock = useRef();
 
   lastShoot.current = Date.now();
 
@@ -65,7 +66,6 @@ const Player = ({ shoot }) => {
         onLock={(e) => {
           let playerPos = vec3(player.current.translation());
           let playerQuat = quat(player.current.rotation());
-          console.log(playerPos);
           if (Date.now() - lastShoot.current > 75) {
             lastShoot.current = Date.now();
             let bullet = {

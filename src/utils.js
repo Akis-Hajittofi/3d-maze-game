@@ -1,5 +1,16 @@
 import Enemy from "./Components/Enemy";
 import Passage from "./Components/Passages";
+
+export const controls = [
+  { name: "forward", keys: ["ArrowUp", "w", "W"] },
+  { name: "backward", keys: ["ArrowDown", "s", "S"] },
+  { name: "left", keys: ["ArrowLeft", "a", "A"] },
+  { name: "right", keys: ["ArrowRight", "d", "D"] },
+  { name: "jump", keys: ["Space"] },
+  { name: "shift", keys: ["Shift"] },
+  { name: "q", keys: ["q", "Q"] },
+];
+
 let c = "#1a273a";
 
 export const roomsConfig = [

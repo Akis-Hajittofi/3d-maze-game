@@ -2,6 +2,7 @@ import { useFrame } from "@react-three/fiber";
 import { RigidBody } from "@react-three/rapier";
 import React, { useCallback, useMemo, useRef } from "react";
 import { Euler, MeshBasicMaterial, Vector3 } from "three";
+import useStore from "../store";
 
 const bulletMaterial = new MeshBasicMaterial({
   color: "red",
@@ -20,7 +21,9 @@ const calculateBulletRotation = (bulletInfo) => {
   return new Euler().setFromQuaternion(bulletInfo.playerQuat);
 };
 
-function Bullet({ bulletInfo, onHit }) {
+function Bullet({ bulletInfo }) {
+  let onHit = useStore((state) => state.onHit);
+
   const ref = useRef();
 
   const bulletPosition = useMemo(
@@ -32,15 +35,18 @@ function Bullet({ bulletInfo, onHit }) {
     [bulletInfo]
   );
 
-  let handelIntersection = useCallback(({ other }) => {
-    if (
-      other.rigidBodyObject.name !== "player" &&
-      other.rigidBodyObject.name !== "sensor"
-    ) {
-      const { name, userData } = other.rigidBodyObject;
-      onHit({ id: bulletInfo.id, name, userData });
-    }
-  }, []);
+  let handelIntersection = useCallback(
+    ({ other }) => {
+      if (
+        other.rigidBodyObject.name !== "player" &&
+        other.rigidBodyObject.name !== "sensor"
+      ) {
+        const { name, userData } = other.rigidBodyObject;
+        onHit(bulletInfo.id, name, userData);
+      }
+    },
+    [onHit, bulletInfo.id]
+  );
 
   useFrame(() => {
     if (ref?.current) {

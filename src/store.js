@@ -3,6 +3,7 @@ import Room from "./Components/Room";
 import Coin from "./Components/Coin";
 import Health from "./Components/Health";
 import { enemies, passages, roomsConfig } from "./utils";
+import Bullet from "./Components/Bullet";
 
 const useStore = create((set, get) => ({
   // triggers and variables
@@ -27,11 +28,35 @@ const useStore = create((set, get) => ({
   )),
 
   // item components
+  bullets: [],
   coins: [],
   healthItems: [],
   enemies: enemies,
 
   // actions
+  shoot: (bullet) => {
+    set((state) => ({
+      bullets: [...state.bullets, <Bullet bulletInfo={bullet} />],
+    }));
+    if (get().bullets.length === 10) {
+      set({ bullets: [] });
+    }
+  },
+  onHit: (bulletId, name, userData) => {
+    // check if hit enemy
+    if (name === "enemy") {
+      get().removeEnemy(userData.id);
+    }
+    // then remove the bullet
+    set((state) => ({
+      bullets: [
+        ...state.bullets.filter(
+          ({ props }) => props.bulletInfo.id !== bulletId
+        ), //10 is the fire-rate
+      ],
+    }));
+  },
+
   addCoin: (coin) => {
     set((state) => ({
       coins: [
