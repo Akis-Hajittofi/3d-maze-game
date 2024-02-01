@@ -1,11 +1,8 @@
-import { useFrame } from "@react-three/fiber";
+import React, { useRef } from "react";
 import { CuboidCollider, RigidBody } from "@react-three/rapier";
-import React from "react";
-import { useRef } from "react";
 
 const Door = ({ color }) => {
   let ref = useRef();
-  useFrame(() => {});
   return (
     <>
       <RigidBody
