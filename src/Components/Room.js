@@ -1,6 +1,7 @@
 import React from "react";
 import Wall from "./Wall";
 import Exit from "./Exit";
+import Door from "./Door";
 
 function WallWithDoor({ position, rotation, color, l = 30 }) {
   const depth = 3;
@@ -27,6 +28,7 @@ function WallWithDoor({ position, rotation, color, l = 30 }) {
         depth={depth}
         color={color}
       />
+      <Door />
       <Wall
         position={rightWall}
         width={roomWidth}

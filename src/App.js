@@ -20,6 +20,7 @@ function Coins() {
 
 function Bullets({ bullets, setBullets }) {
   let removeEnemy = useStore((state) => state.removeEnemy);
+
   const onHit = ({ id: bulletId, name, userData }) => {
     // check if hit enemy
     if (name === "enemy") {
