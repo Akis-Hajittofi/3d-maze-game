@@ -13,7 +13,7 @@ import React, {
   useState,
 } from "react";
 import { Vector3 } from "three";
-import useStore from "../store";
+import useStore from "../../store";
 
 let randomPosition = ([sX, sZ], x, z) => {
   let randomSign = Math.floor(Math.round(Math.random()) * 2 - 1);

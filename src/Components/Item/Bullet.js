@@ -2,7 +2,7 @@ import { useFrame } from "@react-three/fiber";
 import { RigidBody } from "@react-three/rapier";
 import React, { useCallback, useMemo, useRef } from "react";
 import { Euler, MeshBasicMaterial, Vector3 } from "three";
-import useStore from "../store";
+import useStore from "../../store";
 
 const bulletMaterial = new MeshBasicMaterial({
   color: "red",

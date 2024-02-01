@@ -19,7 +19,6 @@ function PassageComponent({
         height={15}
         depth={depth}
         color={color}
-
       />
       <Wall
         position={[0 + offset, 3, 4]}

@@ -1,7 +1,7 @@
 import { useFrame } from "@react-three/fiber";
 import React, { useRef } from "react";
 import { RigidBody } from "@react-three/rapier";
-import useStore from "../store";
+import useStore from "../../store";
 import { Html } from "@react-three/drei";
 
 const Health = ({ x, z, id }) => {

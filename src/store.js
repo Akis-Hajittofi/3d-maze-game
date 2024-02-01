@@ -1,9 +1,9 @@
 import { create } from "zustand";
 import Room from "./Components/Room";
-import Coin from "./Components/Coin";
-import Health from "./Components/Health";
+import Coin from "./Components/Item/Coin";
+import Health from "./Components/Item/Health";
 import { enemies, passages, roomsConfig } from "./utils";
-import Bullet from "./Components/Bullet";
+import Bullet from "./Components/Item/Bullet";
 
 const useStore = create((set, get) => ({
   // triggers and variables

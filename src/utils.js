@@ -1,5 +1,5 @@
-import Enemy from "./Components/Enemy";
-import Passage from "./Components/Passages";
+import Enemy from "./Components/Maze/Enemy";
+import Passage from "./Components/Maze/Passages";
 
 export const controls = [
   { name: "forward", keys: ["ArrowUp", "w", "W"] },

@@ -4,7 +4,7 @@ import { Canvas } from "@react-three/fiber";
 import React, { Suspense } from "react";
 import { Physics, RigidBody } from "@react-three/rapier";
 import Player from "./Components/Player";
-import Ground from "./Components/Ground";
+import Ground from "./Components/Maze/Ground";
 import useStore from "./store";
 import { controls } from "./utils";
 
